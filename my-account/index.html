@@ -140,11 +140,50 @@
                 <div id="reg-success" class="success-msg"></div>
             </form>
 
+            <!-- Forgot Password Form -->
+            <form id="forgot-form" style="display:none" onsubmit="doForgotPassword(event)">
+                <p style="color:#ccc;margin-bottom:15px;text-align:center">Εισάγετε το email σας και θα σας στείλουμε σύνδεσμο για αλλαγή κωδικού.</p>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="forgot-email" placeholder="you@example.com" required>
+                </div>
+                <button type="submit" class="btn-primary" id="forgot-btn">Αποστολή</button>
+                <div id="forgot-error" class="error-msg"></div>
+                <div id="forgot-success" class="success-msg"></div>
+            </form>
+
+            <!-- Reset Password Form -->
+            <form id="reset-form" style="display:none" onsubmit="doResetPassword(event)">
+                <p style="color:#ccc;margin-bottom:15px;text-align:center">Εισάγετε τον νέο κωδικό σας.</p>
+                <input type="hidden" id="reset-token">
+                <div class="form-group">
+                    <label>Νέος κωδικός</label>
+                    <div class="pass-wrapper">
+                        <input type="password" id="reset-password" placeholder="Τουλάχιστον 4 χαρακτήρες" required minlength="4">
+                        <span class="pass-toggle" onclick="togglePass('reset-password', this)">👁️</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Επιβεβαίωση κωδικού</label>
+                    <div class="pass-wrapper">
+                        <input type="password" id="reset-password-confirm" placeholder="Ξανά ο κωδικός" required minlength="4">
+                        <span class="pass-toggle" onclick="togglePass('reset-password-confirm', this)">👁️</span>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" id="reset-btn">Αλλαγή Κωδικού</button>
+                <div id="reset-error" class="error-msg"></div>
+                <div id="reset-success" class="success-msg"></div>
+            </form>
+
             <div class="auth-switch" id="auth-switch-login">
-                Δεν έχετε λογαριασμό; <a onclick="showAuthTab('register')">Εγγραφείτε</a>
+                Δεν έχετε λογαριασμό; <a onclick="showAuthTab('register')">Εγγραφείτε</a><br>
+                <a onclick="showAuthTab('forgot')" style="font-size:13px">Ξεχάσατε τον κωδικό;</a>
             </div>
             <div class="auth-switch" id="auth-switch-register" style="display:none">
                 Έχετε ήδη λογαριασμό; <a onclick="showAuthTab('login')">Συνδεθείτε</a>
+            </div>
+            <div class="auth-switch" id="auth-switch-forgot" style="display:none">
+                <a onclick="showAuthTab('login')">← Επιστροφή στη σύνδεση</a>
             </div>
         </div>
     </div>
@@ -163,6 +202,7 @@
                 <dl class="profile-info">
                     <dt>Όνομα</dt><dd id="profile-name">-</dd>
                     <dt>Email</dt><dd id="profile-email">-</dd>
+                    <dt>Κατάσταση</dt><dd id="profile-verified">-</dd>
                     <dt>Τηλέφωνο</dt><dd id="profile-phone">-</dd>
                     <dt>Μέλος από</dt><dd id="profile-date">-</dd>
                 </dl>
@@ -212,13 +252,20 @@ function togglePass(inputId, el) {
 }
 
 function showAuthTab(tab) {
+    const tabs = ['login', 'register', 'forgot', 'reset'];
     document.querySelectorAll('#auth-tabs .tab-btn').forEach((b, i) => {
         b.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
     });
-    document.getElementById('login-form').style.display = tab === 'login' ? '' : 'none';
-    document.getElementById('register-form').style.display = tab === 'register' ? '' : 'none';
-    document.getElementById('auth-switch-login').style.display = tab === 'login' ? '' : 'none';
-    document.getElementById('auth-switch-register').style.display = tab === 'register' ? '' : 'none';
+    tabs.forEach(t => {
+        const form = document.getElementById(t + '-form');
+        if (form) form.style.display = t === tab ? '' : 'none';
+    });
+    ['login', 'register', 'forgot'].forEach(t => {
+        const sw = document.getElementById('auth-switch-' + t);
+        if (sw) sw.style.display = t === tab ? '' : 'none';
+    });
+    // Show tabs only for login/register
+    document.getElementById('auth-tabs').style.display = ['login','register'].includes(tab) ? '' : 'none';
 }
 
 function showProfileTab(tab) {
@@ -307,6 +354,15 @@ function showProfile(user) {
     document.getElementById('profile-date').textContent = user.created_at || 'Σήμερα';
     document.getElementById('edit-name').value = user.name;
     document.getElementById('edit-phone').value = user.phone || '';
+
+    // Verification status
+    const verEl = document.getElementById('profile-verified');
+    if (user.email_verified) {
+        verEl.innerHTML = '<span style="color:#4CAF50">✅ Επιβεβαιωμένο</span>';
+    } else {
+        verEl.innerHTML = '<span style="color:#ff9800">⏳ Μη επιβεβαιωμένο</span> <a onclick="resendVerification()" style="font-size:12px;cursor:pointer;color:#d4e600">Αποστολή ξανά</a>';
+    }
+
     document.getElementById('nav-user-area').innerHTML = '<a href="/my-account/" style="color:#d4e600;font-weight:700">👤 ' + user.name.split(' ')[0] + '</a>';
     loadOrders();
 }
@@ -350,7 +406,6 @@ async function updateProfile(e) {
     };
     const pwd = document.getElementById('edit-password').value;
     if (pwd) body.password = pwd;
-
     try {
         const result = await apiCall('/me', 'PUT', body);
         if (result.success) {
@@ -358,13 +413,10 @@ async function updateProfile(e) {
             succEl.textContent = '✅ Αποθηκεύτηκε!';
             succEl.style.display = 'block';
             setTimeout(() => succEl.style.display = 'none', 3000);
-            // Refresh profile
             const data = await apiCall('/me', 'GET');
             if (data.user) showProfile(data.user);
         }
-    } catch (err) {
-        console.error('Update error:', err);
-    }
+    } catch (err) { console.error('Update error:', err); }
 }
 
 function doUserLogout() {
@@ -375,8 +427,99 @@ function doUserLogout() {
     document.getElementById('nav-user-area').innerHTML = '';
 }
 
-// Auto-login
+async function resendVerification() {
+    // The register endpoint sends verification, so we just inform the user
+    alert('Ένα νέο email επιβεβαίωσης θα σταλεί σύντομα.');
+}
+
+async function doForgotPassword(e) {
+    e.preventDefault();
+    const btn = document.getElementById('forgot-btn');
+    const errEl = document.getElementById('forgot-error');
+    const succEl = document.getElementById('forgot-success');
+    errEl.style.display = 'none'; succEl.style.display = 'none';
+    btn.disabled = true; btn.textContent = '⏳';
+
+    try {
+        const result = await apiCall('/forgot-password', 'POST', {
+            email: document.getElementById('forgot-email').value
+        });
+        succEl.textContent = '📧 Αν το email υπάρχει, θα λάβετε σύνδεσμο επαναφοράς.';
+        succEl.style.display = 'block';
+    } catch (err) {
+        errEl.textContent = '⚠️ Σφάλμα σύνδεσης';
+        errEl.style.display = 'block';
+    }
+    btn.disabled = false; btn.textContent = 'Αποστολή';
+}
+
+async function doResetPassword(e) {
+    e.preventDefault();
+    const pwd = document.getElementById('reset-password').value;
+    const confirm = document.getElementById('reset-password-confirm').value;
+    const errEl = document.getElementById('reset-error');
+    const succEl = document.getElementById('reset-success');
+    errEl.style.display = 'none'; succEl.style.display = 'none';
+
+    if (pwd !== confirm) {
+        errEl.textContent = 'Οι κωδικοί δεν ταιριάζουν';
+        errEl.style.display = 'block';
+        return;
+    }
+
+    const btn = document.getElementById('reset-btn');
+    btn.disabled = true; btn.textContent = '⏳';
+
+    try {
+        const result = await apiCall('/reset-password', 'POST', {
+            token: document.getElementById('reset-token').value,
+            password: pwd
+        });
+        if (result.success) {
+            succEl.textContent = '✅ Ο κωδικός άλλαξε! Μπορείτε να συνδεθείτε.';
+            succEl.style.display = 'block';
+            setTimeout(() => showAuthTab('login'), 2000);
+        } else {
+            errEl.textContent = result.error || 'Σφάλμα';
+            errEl.style.display = 'block';
+        }
+    } catch (err) {
+        errEl.textContent = '⚠️ Σφάλμα σύνδεσης';
+        errEl.style.display = 'block';
+    }
+    btn.disabled = false; btn.textContent = 'Αλλαγή Κωδικού';
+}
+
+async function handleVerifyToken(token) {
+    try {
+        const result = await apiCall('/verify-email', 'POST', { token });
+        if (result.success) {
+            alert('✅ Το email σας επιβεβαιώθηκε!');
+        } else {
+            alert('❌ Μη έγκυρος ή ληγμένος σύνδεσμος.');
+        }
+    } catch { alert('⚠️ Σφάλμα σύνδεσης'); }
+    // Clean URL
+    window.history.replaceState({}, '', '/my-account/');
+}
+
+// Auto-login + handle URL params
 window.addEventListener('DOMContentLoaded', async () => {
+    const params = new URLSearchParams(window.location.search);
+
+    // Handle verify token
+    if (params.has('verify')) {
+        await handleVerifyToken(params.get('verify'));
+    }
+
+    // Handle reset token
+    if (params.has('reset')) {
+        document.getElementById('reset-token').value = params.get('reset');
+        showAuthTab('reset');
+        return;
+    }
+
+    // Auto-login
     const token = localStorage.getItem('user_token');
     if (token) {
         try {
