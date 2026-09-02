@@ -123,25 +123,5 @@
       "in_stock": true
     }
   ],
-  "motorcycles": [
-    {
-      "id": 7,
-      "name": "Kymco X-Town 300i (2016)",
-      "slug": "kymco-x-town-300i-2016",
-      "price": 3100,
-      "sale_price": 2700,
-      "description": "276 CC ΒΕΝΖΙΝΗ",
-      "images": [
-        "wp-content/uploads/2025/10/Ανώνυμο-σχέδιο-10.jpg",
-        "wp-content/uploads/2025/10/2.jpg",
-        "wp-content/uploads/2025/10/3.jpg",
-        "wp-content/uploads/2025/10/4.jpg",
-        "wp-content/uploads/2025/10/5.jpg",
-        "wp-content/uploads/2025/10/6.jpg",
-        "wp-content/uploads/2025/10/7.jpg",
-        "wp-content/uploads/2025/10/8.jpg"
-      ],
-      "in_stock": true
-    }
-  ]
+  "motorcycles": []
 }
