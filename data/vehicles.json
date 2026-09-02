@@ -1,26 +1,6 @@
 {
   "cars": [
     {
-      "id": 2,
-      "name": "Fiat Punto Evo EVO EURO-5 START-STOP (2012)",
-      "slug": "fiat-punto-evo-evo-euro-5-start-stop-2012",
-      "price": 5600,
-      "sale_price": null,
-      "description": "1249 ΒΕΝΖΙΝΗ",
-      "images": [
-        "wp-content/uploads/2025/10/Ανώνυμο-σχέδιο-10.jpg",
-        "wp-content/uploads/2025/10/8-1.jpg",
-        "wp-content/uploads/2025/10/7-1.jpg",
-        "wp-content/uploads/2025/10/6-1.jpg",
-        "wp-content/uploads/2025/10/5-1.jpg",
-        "wp-content/uploads/2025/10/4-1.jpg",
-        "wp-content/uploads/2025/10/3-1.jpg",
-        "wp-content/uploads/2025/10/11-1.jpg",
-        "wp-content/uploads/2025/10/10-1.jpg"
-      ],
-      "in_stock": true
-    },
-    {
       "id": 5,
       "name": "Renault Megane (2006) 1.6",
       "slug": "renault-megane-2006",
