@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ο Λογαριασμός μου – Automarinikas</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #1a1a2e; color: #eee; min-height: 100vh; }
+        a { color: #d4e600; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* Header */
+        .site-header { background: #16213e; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #d4e600; }
+        .site-header h1 { color: #d4e600; font-size: 22px; }
+        .site-header nav { display: flex; gap: 20px; align-items: center; }
+        .site-header nav a { color: #ccc; font-weight: 500; }
+        .site-header nav a:hover { color: #fff; }
+
+        /* Container */
+        .container { max-width: 600px; margin: 40px auto; padding: 0 20px; }
+
+        /* Auth Forms */
+        .auth-card { background: #16213e; padding: 40px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        .auth-card h2 { color: #d4e600; text-align: center; margin-bottom: 25px; font-size: 24px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #aaa; font-size: 14px; }
+        .form-group input { width: 100%; padding: 14px; border: 1px solid #333; border-radius: 8px; background: #0f3460; color: #fff; font-size: 16px; }
+        .form-group input:focus { border-color: #d4e600; outline: none; }
+        .pass-wrapper { position: relative; }
+        .pass-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 18px; color: #aaa; user-select: none; }
+        .btn-primary { width: 100%; padding: 14px; background: #1a4b8c; color: #fff; border: none; border-radius: 8px; font-size: 18px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        .btn-primary:hover { background: #2563a8; }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .auth-switch { text-align: center; margin-top: 20px; color: #888; }
+        .auth-switch a { cursor: pointer; }
+        .error-msg { color: #ff4444; text-align: center; margin-top: 10px; display: none; }
+        .success-msg { color: #4CAF50; text-align: center; margin-top: 10px; display: none; }
+
+        /* Tabs */
+        .tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #333; }
+        .tab-btn { padding: 12px 25px; cursor: pointer; font-size: 15px; font-weight: 600; color: #aaa; border-bottom: 3px solid transparent; transition: all 0.2s; background: none; border-top: none; border-left: none; border-right: none; }
+        .tab-btn:hover { color: #fff; }
+        .tab-btn.active { color: #d4e600; border-bottom-color: #d4e600; }
+
+        /* Profile */
+        .profile-section { display: none; }
+        .profile-section.active { display: block; }
+        .profile-card { background: #16213e; padding: 25px; border-radius: 10px; margin-bottom: 20px; }
+        .profile-card h3 { color: #d4e600; margin-bottom: 15px; font-size: 18px; }
+        .profile-info { display: grid; grid-template-columns: 120px 1fr; gap: 10px; align-items: center; }
+        .profile-info dt { color: #888; font-size: 14px; }
+        .profile-info dd { color: #fff; font-size: 16px; }
+
+        /* Orders */
+        .order-card { background: #16213e; padding: 20px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #1a4b8c; }
+        .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .order-id { font-weight: 700; color: #d4e600; }
+        .order-status { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-pending { background: #ff9800; color: #000; }
+        .status-contacted { background: #2196F3; color: #fff; }
+        .status-completed { background: #4CAF50; color: #fff; }
+        .status-cancelled { background: #f44336; color: #fff; }
+        .order-items { color: #ccc; font-size: 14px; margin: 8px 0; }
+        .order-total { font-size: 20px; font-weight: 700; color: #d4e600; }
+        .order-date { color: #888; font-size: 13px; }
+        .no-orders { text-align: center; padding: 40px; color: #666; }
+
+        .logout-link { color: #ff4444; cursor: pointer; }
+        .logout-link:hover { color: #ff6666; }
+
+        @media (max-width: 600px) {
+            .container { padding: 0 15px; margin: 20px auto; }
+            .auth-card { padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="site-header">
+    <h1><a href="/" style="color: #d4e600;">🚗 Automarinikas</a></h1>
+    <nav>
+        <a href="/product-category/μεταχειρισμένα-αυτοκίνητα/">Αυτοκίνητα</a>
+        <a href="/product-category/μεταχειρισμένες-μοτοσυκλέτες/">Μοτοσυκλέτες</a>
+        <a href="/cart/">🛒 Καλάθι</a>
+        <span id="nav-user-area"></span>
+    </nav>
+</div>
+
+<div class="container">
+
+    <!-- AUTH SECTION (login/signup) -->
+    <div id="auth-section">
+        <div class="auth-card">
+            <div class="tabs" id="auth-tabs">
+                <button class="tab-btn active" onclick="showAuthTab('login')">Σύνδεση</button>
+                <button class="tab-btn" onclick="showAuthTab('register')">Εγγραφή</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" onsubmit="doUserLogin(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="login-email" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Κωδικός</label>
+                    <div class="pass-wrapper">
+                        <input type="password" id="login-password" placeholder="••••••" required>
+                        <span class="pass-toggle" onclick="togglePass('login-password', this)">👁️</span>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" id="login-btn">Σύνδεση</button>
+                <div id="login-error" class="error-msg"></div>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" style="display:none" onsubmit="doUserRegister(event)">
+                <div class="form-group">
+                    <label>Ονοματεπώνυμο</label>
+                    <input type="text" id="reg-name" placeholder="Γιάννης Παπαδόπουλος" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="reg-email" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Τηλέφωνο</label>
+                    <input type="tel" id="reg-phone" placeholder="69xxxxxxxx">
+                </div>
+                <div class="form-group">
+                    <label>Κωδικός</label>
+                    <div class="pass-wrapper">
+                        <input type="password" id="reg-password" placeholder="Τουλάχιστον 4 χαρακτήρες" required minlength="4">
+                        <span class="pass-toggle" onclick="togglePass('reg-password', this)">👁️</span>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" id="reg-btn">Δημιουργία Λογαριασμού</button>
+                <div id="reg-error" class="error-msg"></div>
+                <div id="reg-success" class="success-msg"></div>
+            </form>
+
+            <div class="auth-switch" id="auth-switch-login">
+                Δεν έχετε λογαριασμό; <a onclick="showAuthTab('register')">Εγγραφείτε</a>
+            </div>
+            <div class="auth-switch" id="auth-switch-register" style="display:none">
+                Έχετε ήδη λογαριασμό; <a onclick="showAuthTab('login')">Συνδεθείτε</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFILE SECTION (after login) -->
+    <div id="profile-section" style="display:none">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showProfileTab('info')">👤 Στοιχεία</button>
+            <button class="tab-btn" onclick="showProfileTab('orders')">📦 Παραγγελίες</button>
+        </div>
+
+        <!-- Profile Info -->
+        <div id="tab-info" class="profile-section active">
+            <div class="profile-card">
+                <h3>Τα στοιχεία μου</h3>
+                <dl class="profile-info">
+                    <dt>Όνομα</dt><dd id="profile-name">-</dd>
+                    <dt>Email</dt><dd id="profile-email">-</dd>
+                    <dt>Τηλέφωνο</dt><dd id="profile-phone">-</dd>
+                    <dt>Μέλος από</dt><dd id="profile-date">-</dd>
+                </dl>
+            </div>
+            <div class="profile-card">
+                <h3>Αλλαγή στοιχείων</h3>
+                <form onsubmit="updateProfile(event)">
+                    <div class="form-group">
+                        <label>Όνομα</label>
+                        <input type="text" id="edit-name">
+                    </div>
+                    <div class="form-group">
+                        <label>Τηλέφωνο</label>
+                        <input type="tel" id="edit-phone">
+                    </div>
+                    <div class="form-group">
+                        <label>Νέος κωδικός (κενό = χωρίς αλλαγή)</label>
+                        <div class="pass-wrapper">
+                            <input type="password" id="edit-password" placeholder="Νέος κωδικός">
+                            <span class="pass-toggle" onclick="togglePass('edit-password', this)">👁️</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">💾 Αποθήκευση</button>
+                    <div id="edit-success" class="success-msg"></div>
+                </form>
+            </div>
+            <p style="text-align:center;margin-top:20px">
+                <a class="logout-link" onclick="doUserLogout()">🚪 Αποσύνδεση</a>
+            </p>
+        </div>
+
+        <!-- Orders -->
+        <div id="tab-orders" class="profile-section">
+            <div id="orders-list"></div>
+        </div>
+    </div>
+</div>
+
+<script src="../js/config.js"></script>
+<script>
+const API_BASE = (window.SHOP_CONFIG && window.SHOP_CONFIG.API_BASE) || 'https://shop.expanding.land/api';
+
+function togglePass(inputId, el) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') { input.type = 'text'; el.textContent = '🔒'; }
+    else { input.type = 'password'; el.textContent = '👁️'; }
+}
+
+function showAuthTab(tab) {
+    document.querySelectorAll('#auth-tabs .tab-btn').forEach((b, i) => {
+        b.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
+    });
+    document.getElementById('login-form').style.display = tab === 'login' ? '' : 'none';
+    document.getElementById('register-form').style.display = tab === 'register' ? '' : 'none';
+    document.getElementById('auth-switch-login').style.display = tab === 'login' ? '' : 'none';
+    document.getElementById('auth-switch-register').style.display = tab === 'register' ? '' : 'none';
+}
+
+function showProfileTab(tab) {
+    document.querySelectorAll('#profile-section .tab-btn').forEach((b, i) => {
+        b.classList.toggle('active', (tab === 'info' && i === 0) || (tab === 'orders' && i === 1));
+    });
+    document.querySelectorAll('.profile-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+}
+
+async function apiCall(endpoint, method, body) {
+    const token = localStorage.getItem('user_token');
+    const opts = {
+        method: method || 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    };
+    if (token) opts.headers['Authorization'] = 'Bearer ' + token;
+    if (body) opts.body = JSON.stringify(body);
+    const resp = await fetch(API_BASE + endpoint, opts);
+    return resp.json();
+}
+
+async function doUserLogin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('login-btn');
+    const errEl = document.getElementById('login-error');
+    errEl.style.display = 'none';
+    btn.disabled = true; btn.textContent = '⏳';
+
+    try {
+        const result = await apiCall('/login', 'POST', {
+            email: document.getElementById('login-email').value,
+            password: document.getElementById('login-password').value
+        });
+        if (result.success) {
+            localStorage.setItem('user_token', result.token);
+            localStorage.setItem('user_data', JSON.stringify(result.user));
+            showProfile(result.user);
+        } else {
+            errEl.textContent = result.error || 'Λάθος στοιχεία';
+            errEl.style.display = 'block';
+        }
+    } catch (err) {
+        errEl.textContent = '⚠️ Σφάλμα σύνδεσης με τον server';
+        errEl.style.display = 'block';
+    }
+    btn.disabled = false; btn.textContent = 'Σύνδεση';
+}
+
+async function doUserRegister(e) {
+    e.preventDefault();
+    const btn = document.getElementById('reg-btn');
+    const errEl = document.getElementById('reg-error');
+    const succEl = document.getElementById('reg-success');
+    errEl.style.display = 'none'; succEl.style.display = 'none';
+    btn.disabled = true; btn.textContent = '⏳';
+
+    try {
+        const result = await apiCall('/register', 'POST', {
+            name: document.getElementById('reg-name').value,
+            email: document.getElementById('reg-email').value,
+            phone: document.getElementById('reg-phone').value,
+            password: document.getElementById('reg-password').value
+        });
+        if (result.success) {
+            localStorage.setItem('user_token', result.token);
+            localStorage.setItem('user_data', JSON.stringify(result.user));
+            showProfile(result.user);
+        } else {
+            errEl.textContent = result.error || 'Σφάλμα εγγραφής';
+            errEl.style.display = 'block';
+        }
+    } catch (err) {
+        errEl.textContent = '⚠️ Σφάλμα σύνδεσης με τον server';
+        errEl.style.display = 'block';
+    }
+    btn.disabled = false; btn.textContent = 'Δημιουργία Λογαριασμού';
+}
+
+function showProfile(user) {
+    document.getElementById('auth-section').style.display = 'none';
+    document.getElementById('profile-section').style.display = '';
+    document.getElementById('profile-name').textContent = user.name;
+    document.getElementById('profile-email').textContent = user.email;
+    document.getElementById('profile-phone').textContent = user.phone || '-';
+    document.getElementById('profile-date').textContent = user.created_at || 'Σήμερα';
+    document.getElementById('edit-name').value = user.name;
+    document.getElementById('edit-phone').value = user.phone || '';
+    document.getElementById('nav-user-area').innerHTML = '<a href="/my-account/" style="color:#d4e600;font-weight:700">👤 ' + user.name.split(' ')[0] + '</a>';
+    loadOrders();
+}
+
+async function loadOrders() {
+    try {
+        const data = await apiCall('/me', 'GET');
+        if (data.user) {
+            const list = document.getElementById('orders-list');
+            if (!data.orders || data.orders.length === 0) {
+                list.innerHTML = '<div class="no-orders"><p style="font-size:48px;margin-bottom:10px">📦</p><p>Δεν έχετε παραγγελίες ακόμα</p><a href="/product-category/μεταχειρισμένα-αυτοκίνητα/" style="color:#d4e600">Δείτε τα οχήματά μας →</a></div>';
+                return;
+            }
+            list.innerHTML = data.orders.map(o => {
+                const items = JSON.parse(o.items_json || '[]');
+                const statusMap = { pending: 'Σε αναμονή', contacted: 'Επικοινωνία', completed: 'Ολοκληρώθηκε', cancelled: 'Ακυρώθηκε' };
+                return `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-id">Παραγγελία #${o.id}</span>
+                            <span class="order-status status-${o.status || 'pending'}">${statusMap[o.status] || 'Σε αναμονή'}</span>
+                        </div>
+                        <div class="order-items">${items.map(i => i.name + ' × ' + i.quantity).join(', ')}</div>
+                        <div style="display:flex;justify-content:space-between;align-items:center">
+                            <span class="order-total">${new Intl.NumberFormat('el-GR', {style:'currency',currency:'EUR'}).format(o.total)}</span>
+                            <span class="order-date">${new Date(o.created_at).toLocaleDateString('el-GR')}</span>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+    } catch (err) {
+        console.error('Load orders error:', err);
+    }
+}
+
+async function updateProfile(e) {
+    e.preventDefault();
+    const body = {
+        name: document.getElementById('edit-name').value,
+        phone: document.getElementById('edit-phone').value
+    };
+    const pwd = document.getElementById('edit-password').value;
+    if (pwd) body.password = pwd;
+
+    try {
+        const result = await apiCall('/me', 'PUT', body);
+        if (result.success) {
+            const succEl = document.getElementById('edit-success');
+            succEl.textContent = '✅ Αποθηκεύτηκε!';
+            succEl.style.display = 'block';
+            setTimeout(() => succEl.style.display = 'none', 3000);
+            // Refresh profile
+            const data = await apiCall('/me', 'GET');
+            if (data.user) showProfile(data.user);
+        }
+    } catch (err) {
+        console.error('Update error:', err);
+    }
+}
+
+function doUserLogout() {
+    localStorage.removeItem('user_token');
+    localStorage.removeItem('user_data');
+    document.getElementById('auth-section').style.display = '';
+    document.getElementById('profile-section').style.display = 'none';
+    document.getElementById('nav-user-area').innerHTML = '';
+}
+
+// Auto-login
+window.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem('user_token');
+    if (token) {
+        try {
+            const data = await apiCall('/me', 'GET');
+            if (data.user) {
+                showProfile(data.user);
+            } else {
+                doUserLogout();
+            }
+        } catch { doUserLogout(); }
+    }
+});
+</script>
+</body>
+</html>
