@@ -1,27 +1,6 @@
 {
   "cars": [
     {
-      "id": 1,
-      "name": "Dacia Sandero (2018) 1.0",
-      "slug": "dacia-sandero-2018-1-0",
-      "price": 8200,
-      "sale_price": null,
-      "description": "1.0 ΒΕΝΖΙΝΗ",
-      "images": [
-        "wp-content/uploads/2025/04/Ανώνυμο-σχέδιο-10-1.jpg",
-        "wp-content/uploads/2025/04/2-1.jpg",
-        "wp-content/uploads/2025/04/3-1.jpg",
-        "wp-content/uploads/2025/04/4-1.jpg",
-        "wp-content/uploads/2025/04/5-1.jpg",
-        "wp-content/uploads/2025/04/6-1.jpg",
-        "wp-content/uploads/2025/04/7-1.jpg",
-        "wp-content/uploads/2025/04/8-1.jpg",
-        "wp-content/uploads/2025/04/9-1.jpg",
-        "wp-content/uploads/2025/04/10-1.jpg"
-      ],
-      "in_stock": true
-    },
-    {
       "id": 2,
       "name": "Fiat Punto Evo EVO EURO-5 START-STOP (2012)",
       "slug": "fiat-punto-evo-evo-euro-5-start-stop-2012",
