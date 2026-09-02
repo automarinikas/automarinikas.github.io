@@ -209,8 +209,14 @@
         <label>Περιγραφή</label>
         <textarea id="v-description" placeholder="π.χ. 1.4 ΒΕΝΖΙΝΗ"></textarea>
         
-        <label>Εικόνες (URLs, μία ανά γραμμή)</label>
-        <textarea id="v-images" placeholder="wp-content/uploads/2024/02/photo1.jpg" style="height:120px"></textarea>
+        <label>Εικόνες</label>
+        <div id="image-upload-area" style="border:2px dashed var(--am-border);border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:border-color 0.2s;margin-bottom:10px;background:rgba(15,29,123,0.02)" ondrop="handleImageDrop(event)" ondragover="event.preventDefault();this.style.borderColor='var(--am-primary)'" ondragleave="this.style.borderColor='var(--am-border)'" onclick="document.getElementById('image-file-input').click()">
+            <p style="color:var(--am-text-light);font-size:14px;margin:0">📷 Σύρετε εικόνες εδώ ή κάντε κλικ για επιλογή</p>
+            <p style="color:var(--am-text-light);font-size:12px;margin-top:5px">JPG, PNG, WebP — μέχρι 10MB</p>
+            <input type="file" id="image-file-input" multiple accept="image/*" style="display:none" onchange="handleImageSelect(this.files)">
+        </div>
+        <div id="image-previews" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px"></div>
+        <input type="hidden" id="v-images-data" value="[]">
         
         <label>Διαθέσιμο</label>
         <select id="v-in-stock">
@@ -387,6 +393,79 @@ function updateStats(data) {
     `;
 }
 
+// ==================== IMAGE UPLOAD ====================
+let currentImages = []; // Array of image URLs for current vehicle
+
+function renderImagePreviews() {
+    const container = document.getElementById('image-previews');
+    container.innerHTML = '';
+    currentImages.forEach((url, i) => {
+        const div = document.createElement('div');
+        div.style.cssText = 'position:relative;width:100px;height:100px;border-radius:6px;overflow:hidden;border:1px solid var(--am-border)';
+        const fullUrl = url.startsWith('http') ? url : (API_BASE + '/' + url.replace(/^\//, ''));
+        div.innerHTML = `
+            <img src="${fullUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%2260%22 x=%2230%22 font-size=%2240%22>📷</text></svg>'">
+            <button onclick="removeImage(${i})" style="position:absolute;top:2px;right:2px;background:rgba(198,40,40,0.9);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;line-height:22px;padding:0" title="Αφαίρεση">✕</button>
+            ${i > 0 ? `<button onclick="moveImageUp(${i})" style="position:absolute;bottom:2px;left:2px;background:rgba(15,29,123,0.8);color:#fff;border:none;border-radius:4px;width:22px;height:22px;font-size:10px;cursor:pointer;padding:0" title="Μετακίνηση αριστερά">◀</button>` : ''}
+        `;
+        container.appendChild(div);
+    });
+    document.getElementById('v-images-data').value = JSON.stringify(currentImages);
+}
+
+function removeImage(index) {
+    currentImages.splice(index, 1);
+    renderImagePreviews();
+}
+
+function moveImageUp(index) {
+    if (index <= 0) return;
+    [currentImages[index-1], currentImages[index]] = [currentImages[index], currentImages[index-1]];
+    renderImagePreviews();
+}
+
+async function uploadFile(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+        const resp = await fetch(API_BASE + '/admin/upload', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + authToken },
+            body: formData
+        });
+        const data = await resp.json();
+        if (data.success) {
+            return data.url;
+        } else {
+            alert('Upload failed: ' + (data.error || 'Unknown error'));
+            return null;
+        }
+    } catch (e) {
+        console.error('Upload error:', e);
+        alert('⚠️ Upload error');
+        return null;
+    }
+}
+
+async function handleImageSelect(files) {
+    for (const file of files) {
+        if (!file.type.startsWith('image/')) continue;
+        if (file.size > 10 * 1024 * 1024) { alert('Μέγιστο μέγεθος 10MB'); continue; }
+        const url = await uploadFile(file);
+        if (url) {
+            currentImages.push(url);
+            renderImagePreviews();
+        }
+    }
+    document.getElementById('image-file-input').value = '';
+}
+
+function handleImageDrop(e) {
+    e.preventDefault();
+    e.currentTarget.style.borderColor = 'var(--am-border)';
+    handleImageSelect(e.dataTransfer.files);
+}
+
 // ==================== ADD/EDIT MODAL ====================
 function openAddModal(category) {
     document.getElementById('modal-title').textContent = category === 'cars' ? 'Προσθήκη Αυτοκινήτου' : 'Προσθήκη Μοτοσυκλέτας';
@@ -397,8 +476,9 @@ function openAddModal(category) {
     document.getElementById('v-price').value = '';
     document.getElementById('v-sale-price').value = '';
     document.getElementById('v-description').value = '';
-    document.getElementById('v-images').value = '';
     document.getElementById('v-in-stock').value = 'true';
+    currentImages = [];
+    renderImagePreviews();
     document.getElementById('vehicle-modal').classList.add('active');
 }
 
@@ -415,8 +495,9 @@ function editVehicle(category, id) {
     document.getElementById('v-price').value = v.price;
     document.getElementById('v-sale-price').value = v.sale_price || '';
     document.getElementById('v-description').value = v.description || '';
-    document.getElementById('v-images').value = (v.images || []).join('\n');
     document.getElementById('v-in-stock').value = v.in_stock ? 'true' : 'false';
+    currentImages = [...(v.images || [])];
+    renderImagePreviews();
     document.getElementById('vehicle-modal').classList.add('active');
 }
 
@@ -434,7 +515,7 @@ async function saveVehicle() {
         price: parseFloat(document.getElementById('v-price').value) || 0,
         sale_price: parseFloat(document.getElementById('v-sale-price').value) || null,
         description: document.getElementById('v-description').value.trim(),
-        images: document.getElementById('v-images').value.trim().split('\n').filter(x => x.trim()),
+        images: currentImages,
         in_stock: document.getElementById('v-in-stock').value === 'true'
     };
     
@@ -497,10 +578,10 @@ async function loadOrders() {
             <td>${o.customer_email || '-'}</td>
             <td>${o.customer_phone || '-'}</td>
             <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis">${itemsText}</td>
-            <td style="font-weight:700;color:#d4e600">${formatPrice(o.total)}</td>
+            <td style="font-weight:700;color:var(--am-primary)">${formatPrice(o.total)}</td>
             <td><span class="status-badge ${statusClass}">${statusText}</span></td>
             <td>
-                <select onchange="updateOrderStatus(${o.id}, this.value)" style="padding:5px;background:#0f3460;color:#fff;border:1px solid #333;border-radius:4px">
+                <select onchange="updateOrderStatus(${o.id}, this.value)" style="padding:5px;background:var(--am-card);color:var(--am-text);border:2px solid var(--am-border);border-radius:6px;font-family:Open Sans Condensed,sans-serif">
                     <option value="pending" ${o.status==='pending'?'selected':''}>Νέα</option>
                     <option value="contacted" ${o.status==='contacted'?'selected':''}>Επικοινωνία</option>
                     <option value="completed" ${o.status==='completed'?'selected':''}>Ολοκληρώθηκε</option>
