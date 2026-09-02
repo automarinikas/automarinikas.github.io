@@ -1,13 +1,14 @@
 /**
- * Automarinikas - Dynamic Vehicle Loader & Live Price Filter
+ * Automarinikas - Dynamic Vehicle Loader, Live Search & Price Filter
  * Loads vehicles from data/vehicles.json, renders product cards,
- * and provides smooth, instantaneous real-time price filtering.
+ * and provides smooth, instantaneous real-time search & price filtering.
  */
 (function() {
     'use strict';
 
     const VEHICLES_JSON_URL = (window.SHOP_CONFIG && window.SHOP_CONFIG.VEHICLES_JSON) || '/data/vehicles.json';
     let loadedVehicles = [];
+    let currentSearchQuery = '';
 
     // Detect which category page we're on
     function getCurrentCategory() {
@@ -34,6 +35,27 @@
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(price);
+    }
+
+    // Clean / normalize string for fuzzy search
+    function cleanStr(s) {
+        return (s || '').toLowerCase()
+            .replace(/[άαΆΑ]/g, 'α')
+            .replace(/[έεΈΕ]/g, 'ε')
+            .replace(/[ήηΉΗ]/g, 'η')
+            .replace(/[ίιϊΐΊΙΪ]/g, 'ι')
+            .replace(/[όοΌΟ]/g, 'ο')
+            .replace(/[ύυϋΰΎΥΫ]/g, 'υ')
+            .replace(/[ώωΏΩ]/g, 'ω');
+    }
+
+    function matchesSearch(vehicle, query) {
+        if (!query) return true;
+        const q = cleanStr(query.trim());
+        if (!q) return true;
+        const haystack = cleanStr(`${vehicle.name} ${vehicle.description || ''} ${vehicle.slug}`);
+        const words = q.split(/\s+/);
+        return words.every(w => haystack.includes(w));
     }
 
     // Create HTML for a single product card
@@ -86,12 +108,37 @@
         productContainer.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:30px;list-style:none;padding:0;margin:20px 0;';
 
         if (vehicles.length === 0) {
-            productContainer.innerHTML = '<li style="grid-column:1/-1;text-align:center;padding:50px 20px;color:#666;font-size:18px;background:#f9f9f9;border-radius:8px">Δεν βρέθηκαν οχήματα σε αυτό το εύρος τιμών.</li>';
+            productContainer.innerHTML = '<li style="grid-column:1/-1;text-align:center;padding:50px 20px;color:#666;font-size:18px;background:#f9f9f9;border-radius:8px">Δεν βρέθηκαν οχήματα που να ταιριάζουν στα κριτήρια αναζήτησης.</li>';
             return;
         }
 
         vehicles.forEach(v => {
             productContainer.insertAdjacentHTML('beforeend', createProductCard(v));
+        });
+    }
+
+    // Setup interactive search input (prevents page redirect, filters live)
+    function setupLiveSearch() {
+        const searchForms = document.querySelectorAll('form.woocommerce-product-search, form[role="search"]');
+        searchForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const input = form.querySelector('input[type="search"], input[name="s"], .search-field');
+                if (input) {
+                    currentSearchQuery = input.value;
+                    if (window.__amApplyFilter) window.__amApplyFilter();
+                }
+                return false;
+            });
+        });
+
+        const searchInputs = document.querySelectorAll('input.search-field, input[type="search"], input[name="s"]');
+        searchInputs.forEach(input => {
+            input.placeholder = 'Αναζήτηση οχήματος...';
+            input.addEventListener('input', function() {
+                currentSearchQuery = this.value;
+                if (window.__amApplyFilter) window.__amApplyFilter();
+            });
         });
     }
 
@@ -232,7 +279,7 @@
         const labelTo = document.getElementById('am-label-to');
         const btnFilter = document.getElementById('am-btn-filter');
 
-        function applyFilter() {
+        function applyFilterAndSearch() {
             const minVal = parseInt(rangeMin.value);
             const maxVal = parseInt(rangeMax.value);
 
@@ -249,13 +296,16 @@
             if (labelFrom) labelFrom.textContent = formatPriceInt(minVal) + ' €';
             if (labelTo) labelTo.textContent = formatPriceInt(maxVal) + ' €';
 
-            // Filter vehicles
+            // Filter vehicles by price AND search query
             const filtered = loadedVehicles.filter(v => {
                 const p = v.sale_price || v.price;
-                return p >= minVal && p <= maxVal;
+                const matchesPrice = p >= minVal && p <= maxVal;
+                return matchesPrice && matchesSearch(v, currentSearchQuery);
             });
             renderVehicleList(filtered);
         }
+
+        window.__amApplyFilter = applyFilterAndSearch;
 
         // Live input handlers
         rangeMin.addEventListener('input', () => {
@@ -264,7 +314,7 @@
             }
             rangeMin.style.zIndex = '13';
             rangeMax.style.zIndex = '12';
-            applyFilter();
+            applyFilterAndSearch();
         });
 
         rangeMax.addEventListener('input', () => {
@@ -273,15 +323,15 @@
             }
             rangeMax.style.zIndex = '13';
             rangeMin.style.zIndex = '12';
-            applyFilter();
+            applyFilterAndSearch();
         });
 
         if (btnFilter) {
-            btnFilter.addEventListener('click', applyFilter);
+            btnFilter.addEventListener('click', applyFilterAndSearch);
         }
 
         // Initial apply
-        applyFilter();
+        applyFilterAndSearch();
     }
 
     // Main: load and render
@@ -303,9 +353,10 @@
                 .sort((a, b) => (a.sale_price || a.price) - (b.sale_price || b.price));
 
             renderVehicleList(loadedVehicles);
+            setupLiveSearch();
             setupPriceFilter(loadedVehicles);
 
-            console.log(`Dynamic vehicles: Loaded & initialized filter for ${loadedVehicles.length} ${category}`);
+            console.log(`Dynamic vehicles: Loaded & initialized live search & price filter for ${loadedVehicles.length} ${category}`);
         } catch (err) {
             console.error('Dynamic vehicles: Error loading', err);
         }
