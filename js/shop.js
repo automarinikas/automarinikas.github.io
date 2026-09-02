@@ -5,7 +5,7 @@
 (function() {
     'use strict';
     
-    const API_BASE = 'http://188.245.107.158:3200';
+    const API_BASE = 'https://shop.expanding.land/api';
     
     // Product ID mapping - matches the database
     const PRODUCT_SLUGS = {
