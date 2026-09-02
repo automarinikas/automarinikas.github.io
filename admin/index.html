@@ -246,6 +246,12 @@
             <option value="false">Όχι - Πουλήθηκε</option>
         </select>
         
+        <label>Προσφορά!</label>
+        <select id="v-on-offer">
+            <option value="false">Όχι</option>
+            <option value="true">Ναι - Εμφάνιση Badge «Προσφορά!»</option>
+        </select>
+        
         <div class="modal-actions">
             <button class="btn btn-danger" onclick="closeModal()">Ακύρωση</button>
             <button class="btn btn-success" onclick="saveVehicle()">💾 Αποθήκευση</button>
@@ -386,10 +392,13 @@ function renderVehicleGrid(category, vehicles) {
             : formatPrice(v.price);
         const stockClass = v.in_stock ? 'in-stock' : 'sold';
         const stockText = v.in_stock ? 'Διαθέσιμο' : 'Πουλήθηκε';
+        const offerBadge = v.on_offer ? '<span style="position:absolute;top:8px;left:8px;background:var(--am-accent);color:var(--am-primary);padding:3px 10px;font-weight:700;font-size:12px;border-radius:4px;z-index:2">Προσφορά!</span>' : '';
         
         const card = document.createElement('div');
         card.className = 'vehicle-card';
+        card.style.position = 'relative';
         card.innerHTML = `
+            ${offerBadge}
             ${imgSrc ? `<img src="${imgSrc}" alt="${v.name}" onerror="this.outerHTML='<div class=no-img>🚗</div>'">` : '<div class="no-img">🚗</div>'}
             <div class="info">
                 <div class="name">${v.name}</div>
@@ -500,6 +509,7 @@ function openAddModal(category) {
     document.getElementById('v-sale-price').value = '';
     document.getElementById('v-description').value = '';
     document.getElementById('v-in-stock').value = 'true';
+    document.getElementById('v-on-offer').value = 'false';
     currentImages = [];
     renderImagePreviews();
     document.getElementById('vehicle-modal').classList.add('active');
@@ -519,6 +529,7 @@ function editVehicle(category, id) {
     document.getElementById('v-sale-price').value = v.sale_price || '';
     document.getElementById('v-description').value = v.description || '';
     document.getElementById('v-in-stock').value = v.in_stock ? 'true' : 'false';
+    document.getElementById('v-on-offer').value = v.on_offer ? 'true' : 'false';
     currentImages = [...(v.images || [])];
     renderImagePreviews();
     document.getElementById('vehicle-modal').classList.add('active');
@@ -539,7 +550,8 @@ async function saveVehicle() {
         sale_price: parseFloat(document.getElementById('v-sale-price').value) || null,
         description: document.getElementById('v-description').value.trim(),
         images: currentImages,
-        in_stock: document.getElementById('v-in-stock').value === 'true'
+        in_stock: document.getElementById('v-in-stock').value === 'true',
+        on_offer: document.getElementById('v-on-offer').value === 'true'
     };
     
     if (!vehicle.name || !vehicle.slug || !vehicle.price) {

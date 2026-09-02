@@ -1,0 +1,11 @@
+{
+  "icons": [
+    {
+      "id": "prosfora",
+      "name": "Προσφορά!",
+      "file": "prosfora.png",
+      "type": "badge",
+      "position": "top-left"
+    }
+  ]
+}
