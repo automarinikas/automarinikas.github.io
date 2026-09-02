@@ -69,45 +69,15 @@
 
     // Find and replace the product listing area
     function renderVehicles(vehicles) {
-        // Find the existing product listing (WooCommerce shop products)
-        let productContainer = document.querySelector('ul.products');
-        
-        if (!productContainer) {
-            // Try finding the Thrive WooCommerce shop products section
-            const shopSection = document.querySelector('.thrv_woocommerce_shop_products');
-            if (shopSection) {
-                productContainer = shopSection.querySelector('ul') || shopSection;
-            }
-        }
+        // Find the existing product listing - try multiple selectors
+        let productContainer = document.querySelector('ul.products') 
+            || document.querySelector('.products')
+            || document.querySelector('.thrv_woocommerce_shop_products ul')
+            || document.querySelector('.thrv_woocommerce_shop_products');
 
         if (!productContainer) {
-            // Last resort - find the area near the price filter
-            const priceFilter = document.querySelector('.widget_price_filter');
-            if (priceFilter) {
-                // The product grid is usually in the main content area
-                const mainContent = document.querySelector('.main-content') || document.querySelector('[class*="main"]') || document.querySelector('.tve-content-inner');
-                if (mainContent) {
-                    const existingUl = mainContent.querySelector('ul.products');
-                    if (existingUl) {
-                        productContainer = existingUl;
-                    }
-                }
-            }
-        }
-
-        if (!productContainer) {
-            console.log('Dynamic vehicles: No product container found, creating one');
-            // Create a product container and insert it before the footer
-            const shopSection = document.querySelector('.thrv_woocommerce_shop_products');
-            if (shopSection) {
-                productContainer = document.createElement('ul');
-                productContainer.className = 'products columns-2';
-                productContainer.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:30px;list-style:none;padding:0;margin:20px 0;';
-                shopSection.innerHTML = '';
-                shopSection.appendChild(productContainer);
-            } else {
-                return; // Can't find where to put products
-            }
+            console.warn('Dynamic vehicles: No product container found');
+            return;
         }
 
         // Clear existing products and render new ones
