@@ -39,7 +39,7 @@
     // Create HTML for a single product card
     function createProductCard(vehicle) {
         const imgSrc = vehicle.images && vehicle.images.length > 0
-            ? '../../' + vehicle.images[0]
+            ? '../../' + vehicle.images[0].replace(/^\//, '')
             : '../../wp-content/uploads/2021/11/automarinikas-logo.jpg';
 
         const productUrl = '../../product/' + vehicle.slug + '/';
@@ -95,141 +95,161 @@
         });
     }
 
-    // Initialize live interactive price filter
+    // Initialize smooth, glitch-free live interactive price filter
     function setupPriceFilter(vehicles) {
-        if (vehicles.length === 0) return;
+        if (!vehicles || vehicles.length === 0) return;
 
         const prices = vehicles.map(v => v.sale_price || v.price);
-        let minBoundary = Math.floor(Math.min(...prices) / 100) * 100;
-        let maxBoundary = Math.ceil(Math.max(...prices) / 100) * 100;
+        let minPrice = Math.min(...prices);
+        let maxPrice = Math.max(...prices);
+
+        let minBoundary = Math.floor(minPrice / 100) * 100;
+        let maxBoundary = Math.ceil(maxPrice / 100) * 100;
 
         if (maxBoundary <= minBoundary) {
             minBoundary = Math.max(0, minBoundary - 500);
             maxBoundary = maxBoundary + 500;
         }
 
-        // Find filter widgets
-        const filterWrappers = document.querySelectorAll('.price_slider_wrapper');
-        if (filterWrappers.length === 0) return;
-
-        // Hide duplicate filter widgets if any exist in the page
-        filterWrappers.forEach((w, idx) => {
-            if (idx > 0) {
-                const parentSection = w.closest('section') || w.closest('.thrv_woocommerce_price_filter');
-                if (parentSection) parentSection.style.display = 'none';
-            }
-        });
-
-        const wrapper = filterWrappers[0];
+        // Locate widget target
+        const widgetContainer = document.querySelector('.thrv_woocommerce_price_filter') 
+            || document.querySelector('.widget_price_filter') 
+            || document.querySelector('.price_slider_wrapper');
         
-        // Hide default static woo slider elements
-        const oldSlider = wrapper.querySelector('.price_slider');
-        if (oldSlider) oldSlider.style.display = 'none';
+        if (!widgetContainer) return;
 
-        // Check if our custom slider is already inserted
-        let customBox = wrapper.querySelector('.am-custom-price-slider');
-        if (!customBox) {
-            customBox = document.createElement('div');
-            customBox.className = 'am-custom-price-slider';
-            customBox.style.cssText = 'padding: 15px 0 10px; user-select: none;';
-            
-            customBox.innerHTML = `
-                <div style="position:relative;height:28px;margin-bottom:12px;">
-                    <div style="position:absolute;left:0;right:0;top:11px;height:6px;background:#e2e8f0;border-radius:3px;">
-                        <div id="am-filter-track" style="position:absolute;height:100%;background:#0f1d7b;border-radius:3px;left:0%;width:100%"></div>
-                    </div>
-                    <input type="range" id="am-range-min" min="${minBoundary}" max="${maxBoundary}" value="${minBoundary}" step="50"
-                        style="position:absolute;width:100%;appearance:none;-webkit-appearance:none;background:transparent;pointer-events:none;z-index:10;margin:0;top:2px;">
-                    <input type="range" id="am-range-max" min="${minBoundary}" max="${maxBoundary}" value="${maxBoundary}" step="50"
-                        style="position:absolute;width:100%;appearance:none;-webkit-appearance:none;background:transparent;pointer-events:none;z-index:11;margin:0;top:2px;">
-                </div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:14px;color:#333;font-weight:700;">
-                    <span>Τιμή: <span id="am-label-from" style="color:#0f1d7b">${formatPriceInt(minBoundary)} €</span> &mdash; <span id="am-label-to" style="color:#0f1d7b">${formatPriceInt(maxBoundary)} €</span></span>
-                </div>
+        // Inject Styles once
+        if (!document.getElementById('am-slider-styles')) {
+            const style = document.createElement('style');
+            style.id = 'am-slider-styles';
+            style.textContent = `
+                .am-price-filter-box {
+                    padding: 5px 0 15px;
+                    font-family: var(--am-font, 'Open Sans Condensed', sans-serif);
+                    user-select: none;
+                }
+                .am-slider-track-wrap {
+                    position: relative;
+                    height: 32px;
+                    display: flex;
+                    align-items: center;
+                    margin: 8px 0 12px;
+                }
+                .am-slider-bg-bar {
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    height: 8px;
+                    background: #e2e8f0;
+                    border-radius: 4px;
+                }
+                .am-slider-active-bar {
+                    position: absolute;
+                    height: 8px;
+                    background: #004aad;
+                    border-radius: 4px;
+                    left: 0%;
+                    width: 100%;
+                }
+                .am-slider-input {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: 32px;
+                    -webkit-appearance: none;
+                    appearance: none;
+                    background: transparent;
+                    pointer-events: none;
+                    margin: 0;
+                    outline: none;
+                }
+                .am-slider-input::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    pointer-events: auto;
+                    width: 22px;
+                    height: 22px;
+                    border-radius: 50%;
+                    background: #004aad;
+                    border: 3px solid #e7ff00;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                    cursor: grab;
+                    transition: transform 0.1s ease;
+                }
+                .am-slider-input::-webkit-slider-thumb:active {
+                    cursor: grabbing;
+                    transform: scale(1.2);
+                }
+                .am-slider-input::-moz-range-thumb {
+                    pointer-events: auto;
+                    width: 22px;
+                    height: 22px;
+                    border-radius: 50%;
+                    background: #004aad;
+                    border: 3px solid #e7ff00;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                    cursor: grab;
+                    border: none;
+                }
+                .am-slider-input::-webkit-slider-runnable-track {
+                    -webkit-appearance: none;
+                    background: transparent;
+                }
+                .am-slider-input::-moz-range-track {
+                    background: transparent;
+                }
+                #am-btn-filter:hover {
+                    background: #0f1d7b !important;
+                }
             `;
-
-            // Insert at top of wrapper
-            wrapper.insertBefore(customBox, wrapper.firstChild);
-
-            // Add styles for slider thumbs
-            if (!document.getElementById('am-slider-styles')) {
-                const style = document.createElement('style');
-                style.id = 'am-slider-styles';
-                style.textContent = `
-                    .am-custom-price-slider input[type="range"]::-webkit-slider-thumb {
-                        pointer-events: all;
-                        cursor: grab;
-                        -webkit-appearance: none;
-                        width: 22px;
-                        height: 22px;
-                        border-radius: 50%;
-                        background: #0f1d7b;
-                        border: 3px solid #e7ff00;
-                        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-                        transition: transform 0.1s;
-                    }
-                    .am-custom-price-slider input[type="range"]::-webkit-slider-thumb:active {
-                        cursor: grabbing;
-                        transform: scale(1.15);
-                    }
-                    .am-custom-price-slider input[type="range"]::-moz-range-thumb {
-                        pointer-events: all;
-                        cursor: grab;
-                        width: 22px;
-                        height: 22px;
-                        border-radius: 50%;
-                        background: #0f1d7b;
-                        border: 3px solid #e7ff00;
-                        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-                    }
-                `;
-                document.head.appendChild(style);
-            }
+            document.head.appendChild(style);
         }
+
+        // Replace widget contents with clean custom HTML
+        widgetContainer.innerHTML = `
+            <div class="am-price-filter-box">
+                <h3 style="margin: 0 0 10px; font-size: 20px; font-weight: 700; color: #1a1a2e; text-transform: uppercase;">Τιμή</h3>
+                <div class="am-slider-track-wrap">
+                    <div class="am-slider-bg-bar"></div>
+                    <div class="am-slider-active-bar" id="am-slider-active-bar"></div>
+                    <input type="range" class="am-slider-input" id="am-range-min" min="${minBoundary}" max="${maxBoundary}" value="${minBoundary}" step="50" style="z-index: 11;">
+                    <input type="range" class="am-slider-input" id="am-range-max" min="${minBoundary}" max="${maxBoundary}" value="${maxBoundary}" step="50" style="z-index: 12;">
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                    <button type="button" id="am-btn-filter" style="background: #004aad; color: #ffffff; border: none; border-radius: 4px; padding: 7px 16px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s;">Φιλτράρισμα</button>
+                    <div style="font-size: 14px; font-weight: 700; color: #333;">
+                        Τιμή: <span id="am-label-from" style="color: #004aad">${formatPriceInt(minBoundary)} €</span> &mdash; <span id="am-label-to" style="color: #004aad">${formatPriceInt(maxBoundary)} €</span>
+                    </div>
+                </div>
+            </div>
+        `;
 
         const rangeMin = document.getElementById('am-range-min');
         const rangeMax = document.getElementById('am-range-max');
-        const track = document.getElementById('am-filter-track');
+        const activeBar = document.getElementById('am-slider-active-bar');
         const labelFrom = document.getElementById('am-label-from');
         const labelTo = document.getElementById('am-label-to');
+        const btnFilter = document.getElementById('am-btn-filter');
 
-        // Dynamic z-index handling to prevent thumbs from blocking each other
-        rangeMin.addEventListener('input', () => {
-            if (parseInt(rangeMin.value) > parseInt(rangeMax.value) - 100) {
-                rangeMin.value = parseInt(rangeMax.value) - 100;
-            }
-            rangeMin.style.zIndex = '12';
-            rangeMax.style.zIndex = '11';
-            onFilterChange();
-        });
-
-        rangeMax.addEventListener('input', () => {
-            if (parseInt(rangeMax.value) < parseInt(rangeMin.value) + 100) {
-                rangeMax.value = parseInt(rangeMin.value) + 100;
-            }
-            rangeMax.style.zIndex = '12';
-            rangeMin.style.zIndex = '11';
-            onFilterChange();
-        });
-
-        function onFilterChange() {
+        function applyFilter() {
             const minVal = parseInt(rangeMin.value);
             const maxVal = parseInt(rangeMax.value);
 
-            // Update Track
+            // Update Track Bar
             const total = maxBoundary - minBoundary || 1;
-            const leftPercent = ((minVal - minBoundary) / total) * 100;
-            const rightPercent = ((maxVal - minBoundary) / total) * 100;
-            if (track) {
-                track.style.left = leftPercent + '%';
-                track.style.width = (rightPercent - leftPercent) + '%';
+            const leftPct = ((minVal - minBoundary) / total) * 100;
+            const rightPct = ((maxVal - minBoundary) / total) * 100;
+            if (activeBar) {
+                activeBar.style.left = leftPct + '%';
+                activeBar.style.width = (rightPct - leftPct) + '%';
             }
 
             // Update Labels
             if (labelFrom) labelFrom.textContent = formatPriceInt(minVal) + ' €';
             if (labelTo) labelTo.textContent = formatPriceInt(maxVal) + ' €';
 
-            // Filter loaded vehicles instantly
+            // Filter vehicles
             const filtered = loadedVehicles.filter(v => {
                 const p = v.sale_price || v.price;
                 return p >= minVal && p <= maxVal;
@@ -237,18 +257,31 @@
             renderVehicleList(filtered);
         }
 
-        // Intercept form submission so button also filters smoothly without reload
-        const form = wrapper.closest('form');
-        if (form) {
-            form.onsubmit = function(e) {
-                e.preventDefault();
-                onFilterChange();
-                return false;
-            };
+        // Live input handlers
+        rangeMin.addEventListener('input', () => {
+            if (parseInt(rangeMin.value) > parseInt(rangeMax.value) - 100) {
+                rangeMin.value = parseInt(rangeMax.value) - 100;
+            }
+            rangeMin.style.zIndex = '13';
+            rangeMax.style.zIndex = '12';
+            applyFilter();
+        });
+
+        rangeMax.addEventListener('input', () => {
+            if (parseInt(rangeMax.value) < parseInt(rangeMin.value) + 100) {
+                rangeMax.value = parseInt(rangeMin.value) + 100;
+            }
+            rangeMax.style.zIndex = '13';
+            rangeMin.style.zIndex = '12';
+            applyFilter();
+        });
+
+        if (btnFilter) {
+            btnFilter.addEventListener('click', applyFilter);
         }
 
-        // Initial setup
-        onFilterChange();
+        // Initial apply
+        applyFilter();
     }
 
     // Main: load and render
@@ -272,7 +305,7 @@
             renderVehicleList(loadedVehicles);
             setupPriceFilter(loadedVehicles);
 
-            console.log(`Dynamic vehicles: Successfully loaded & initialized filter for ${loadedVehicles.length} items`);
+            console.log(`Dynamic vehicles: Loaded & initialized filter for ${loadedVehicles.length} ${category}`);
         } catch (err) {
             console.error('Dynamic vehicles: Error loading', err);
         }
