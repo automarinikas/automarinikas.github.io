@@ -138,6 +138,7 @@
         <div class="tab active" onclick="switchTab('cars')">🚗 Αυτοκίνητα</div>
         <div class="tab" onclick="switchTab('motorcycles')">🏍️ Μοτοσυκλέτες</div>
         <div class="tab" onclick="switchTab('orders')">📦 Παραγγελίες</div>
+        <div class="tab" onclick="switchTab('users')">👥 Χρήστες</div>
     </div>
     
     <div class="content">
@@ -182,6 +183,27 @@
                     </tr>
                 </thead>
                 <tbody id="orders-body"></tbody>
+            </table>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="tab-users" class="tab-content">
+            <div class="toolbar">
+                <h2>Εγγεγραμμένοι Χρήστες</h2>
+            </div>
+            <table class="orders-table" id="users-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Όνομα</th>
+                        <th>Email</th>
+                        <th>Τηλέφωνο</th>
+                        <th>Επιβεβαιωμένο</th>
+                        <th>Εγγραφή</th>
+                        <th>Ενέργειες</th>
+                    </tr>
+                </thead>
+                <tbody id="users-body"></tbody>
             </table>
         </div>
     </div>
@@ -333,11 +355,12 @@ async function adminAPI(endpoint, method, body) {
 // ==================== TABS ====================
 function switchTab(tab) {
     document.querySelectorAll('.tab').forEach((t, i) => {
-        t.classList.toggle('active', ['cars','motorcycles','orders'][i] === tab);
+        t.classList.toggle('active', ['cars','motorcycles','orders','users'][i] === tab);
     });
     document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
     document.getElementById('tab-' + tab).classList.add('active');
     if (tab === 'orders') loadOrders();
+    if (tab === 'users') loadUsers();
 }
 
 // ==================== VEHICLES ====================
@@ -619,6 +642,45 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// ==================== USERS ====================
+async function loadUsers() {
+    const data = await adminAPI('/admin/users');
+    if (!data || !data.users) return;
+    const tbody = document.getElementById('users-body');
+    tbody.innerHTML = '';
+    if (data.users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--am-text-light)">Δεν υπάρχουν εγγεγραμμένοι χρήστες</td></tr>';
+        return;
+    }
+    data.users.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${u.id}</td>
+            <td>${u.name}</td>
+            <td>${u.email}</td>
+            <td>${u.phone || '-'}</td>
+            <td>${u.email_verified ? '<span style="color:#2e7d32">✅</span>' : '<span style="color:#e65100">❌</span>'}</td>
+            <td>${u.created_at ? new Date(u.created_at).toLocaleDateString('el-GR') : '-'}</td>
+            <td>
+                <button class="btn btn-primary" onclick="resetUserPassword('${u.email.replace(/'/g, "\\'")}')">🔑 Reset</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+async function resetUserPassword(email) {
+    const newPass = prompt('Νέος κωδικός για ' + email + ':');
+    if (!newPass) return;
+    if (newPass.length < 4) { alert('Τουλάχιστον 4 χαρακτήρες'); return; }
+    const result = await adminAPI('/admin/reset-user-password', 'POST', { email, new_password: newPass });
+    if (result && result.success) {
+        alert('✅ Ο κωδικός άλλαξε για ' + email);
+    } else {
+        alert('❌ Σφάλμα: ' + (result?.error || 'Αποτυχία'));
+    }
+}
 </script>
 </body>
 </html>
