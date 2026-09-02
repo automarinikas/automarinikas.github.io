@@ -89,8 +89,9 @@
             return;
         }
 
-        // Only show in-stock vehicles
-        const inStock = vehicles.filter(v => v.in_stock !== false);
+        // Only show in-stock vehicles, sorted cheapest first
+        const inStock = vehicles.filter(v => v.in_stock !== false)
+            .sort((a, b) => (a.sale_price || a.price) - (b.sale_price || b.price));
         inStock.forEach(vehicle => {
             productContainer.insertAdjacentHTML('beforeend', createProductCard(vehicle));
         });
