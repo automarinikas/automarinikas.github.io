@@ -224,14 +224,64 @@
         <input type="text" id="v-slug" placeholder="π.χ. fiat-punto-2012">
         <small style="display:block;color:#666;margin-top:-6px;margin-bottom:12px;font-size:12px">📌 Η διεύθυνση URL της σελίδας του οχήματος (π.χ. automarinikas.github.io/product/<strong>fiat-punto-2012</strong>/). Συμπληρώνεται αυτόματα.</small>
         
-        <label>Τιμή (€) *</label>
-        <input type="number" id="v-price" placeholder="5000">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+                <label>Τιμή (€) *</label>
+                <input type="number" id="v-price" placeholder="5000">
+            </div>
+            <div>
+                <label>Τιμή Προσφοράς (€)</label>
+                <input type="number" id="v-sale-price" placeholder="Κενό αν δεν υπάρχει">
+            </div>
+        </div>
         
-        <label>Τιμή Προσφοράς (€)</label>
-        <input type="number" id="v-sale-price" placeholder="Κενό αν δεν υπάρχει">
+        <label>Σύντομη Περιγραφή</label>
+        <input type="text" id="v-description" placeholder="π.χ. 1.4 ΒΕΝΖΙΝΗ">
+
+        <label>Αναλυτική Περιγραφή (Κείμενο στην Καρτέλα «Περιγραφή»)</label>
+        <textarea id="v-full-description" rows="4" placeholder="π.χ. Σε άψογη κατάσταση, Ελληνικής Αντιπροσωπείας, ατρακάριστο, με πραγματικά χιλιόμετρα..."></textarea>
         
-        <label>Περιγραφή</label>
-        <textarea id="v-description" placeholder="π.χ. 1.4 ΒΕΝΖΙΝΗ"></textarea>
+        <div style="background:#f8f9fa;border:1px solid #e2e8f0;border-radius:8px;padding:15px;margin:15px 0;">
+            <h3 style="font-size:15px;margin:0 0 12px;color:var(--am-primary);text-transform:uppercase;letter-spacing:0.5px;">📋 Επιπλέον Πληροφορίες (Τεχνικά Χαρακτηριστικά)</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div>
+                    <label style="font-size:12px;margin-bottom:2px;">Καύσιμο</label>
+                    <input type="text" id="v-extra-fuel" placeholder="π.χ. Βενζίνη, Πετρέλαιο">
+                </div>
+                <div>
+                    <label style="font-size:12px;margin-bottom:2px;">Κυβικά</label>
+                    <input type="text" id="v-extra-cc" placeholder="π.χ. 998cc, 1400cc">
+                </div>
+                <div>
+                    <label style="font-size:12px;margin-bottom:2px;">Μάρκα</label>
+                    <input type="text" id="v-extra-make" placeholder="π.χ. PEUGEOT, FIAT">
+                </div>
+                <div>
+                    <label style="font-size:12px;margin-bottom:2px;">Μοντέλο</label>
+                    <input type="text" id="v-extra-model" placeholder="π.χ. 107, Punto">
+                </div>
+                <div>
+                    <label style="font-size:12px;margin-bottom:2px;">Σασμάν</label>
+                    <input type="text" id="v-extra-gearbox" placeholder="π.χ. Αυτόματο, Χειροκίνητο">
+                </div>
+                <div>
+                    <label style="font-size:12px;margin-bottom:2px;">Τύπος</label>
+                    <input type="text" id="v-extra-body" placeholder="π.χ. Hatchback, Combi, Scooter">
+                </div>
+                <div>
+                    <label style="font-size:12px;margin-bottom:2px;">Χιλιόμετρα</label>
+                    <input type="text" id="v-extra-km" placeholder="π.χ. 135.000">
+                </div>
+                <div>
+                    <label style="font-size:12px;margin-bottom:2px;">Χρώμα</label>
+                    <input type="text" id="v-extra-color" placeholder="π.χ. Κόκκινο, Μπλε, Ασημί">
+                </div>
+                <div style="grid-column:1/-1;">
+                    <label style="font-size:12px;margin-bottom:2px;">Χρονολογία</label>
+                    <input type="text" id="v-extra-year" placeholder="π.χ. 2007, 2012, 2018">
+                </div>
+            </div>
+        </div>
         
         <label>Εικόνες</label>
         <div id="image-upload-area" style="border:2px dashed var(--am-border);border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:border-color 0.2s;margin-bottom:10px;background:rgba(15,29,123,0.02)" ondrop="handleImageDrop(event)" ondragover="event.preventDefault();this.style.borderColor='var(--am-primary)'" ondragleave="this.style.borderColor='var(--am-border)'" onclick="document.getElementById('image-file-input').click()">
@@ -242,17 +292,22 @@
         <div id="image-previews" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px"></div>
         <input type="hidden" id="v-images-data" value="[]">
         
-        <label>Διαθέσιμο</label>
-        <select id="v-in-stock">
-            <option value="true">Ναι - Διαθέσιμο</option>
-            <option value="false">Όχι - Πουλήθηκε</option>
-        </select>
-        
-        <label>Προσφορά!</label>
-        <select id="v-on-offer">
-            <option value="false">Όχι</option>
-            <option value="true">Ναι - Εμφάνιση Badge «Προσφορά!»</option>
-        </select>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+                <label>Διαθέσιμο</label>
+                <select id="v-in-stock">
+                    <option value="true">Ναι - Διαθέσιμο</option>
+                    <option value="false">Όχι - Πουλήθηκε</option>
+                </select>
+            </div>
+            <div>
+                <label>Προσφορά!</label>
+                <select id="v-on-offer">
+                    <option value="false">Όχι</option>
+                    <option value="true">Ναι - Badge «Προσφορά!»</option>
+                </select>
+            </div>
+        </div>
         
         <div class="modal-actions">
             <button class="btn btn-danger" onclick="closeModal()">Ακύρωση</button>
@@ -521,6 +576,16 @@ function openAddModal(category) {
     document.getElementById('v-price').value = '';
     document.getElementById('v-sale-price').value = '';
     document.getElementById('v-description').value = '';
+    document.getElementById('v-full-description').value = '';
+    document.getElementById('v-extra-fuel').value = '';
+    document.getElementById('v-extra-cc').value = '';
+    document.getElementById('v-extra-make').value = '';
+    document.getElementById('v-extra-model').value = '';
+    document.getElementById('v-extra-gearbox').value = '';
+    document.getElementById('v-extra-body').value = '';
+    document.getElementById('v-extra-km').value = '';
+    document.getElementById('v-extra-color').value = '';
+    document.getElementById('v-extra-year').value = '';
     document.getElementById('v-in-stock').value = 'true';
     document.getElementById('v-on-offer').value = 'false';
     currentImages = [];
@@ -541,7 +606,20 @@ function editVehicle(category, id) {
     document.getElementById('v-price').value = v.price;
     document.getElementById('v-sale-price').value = v.sale_price || '';
     document.getElementById('v-description').value = v.description || '';
-    document.getElementById('v-in-stock').value = v.in_stock ? 'true' : 'false';
+    document.getElementById('v-full-description').value = v.full_description || '';
+    
+    const extra = v.extra_info || {};
+    document.getElementById('v-extra-fuel').value = extra.fuel || '';
+    document.getElementById('v-extra-cc').value = extra.cc || '';
+    document.getElementById('v-extra-make').value = extra.make || '';
+    document.getElementById('v-extra-model').value = extra.model || '';
+    document.getElementById('v-extra-gearbox').value = extra.gearbox || '';
+    document.getElementById('v-extra-body').value = extra.body_type || '';
+    document.getElementById('v-extra-km').value = extra.km || '';
+    document.getElementById('v-extra-color').value = extra.color || '';
+    document.getElementById('v-extra-year').value = extra.year || '';
+
+    document.getElementById('v-in-stock').value = v.in_stock !== false ? 'true' : 'false';
     document.getElementById('v-on-offer').value = v.on_offer ? 'true' : 'false';
     currentImages = [...(v.images || [])];
     renderImagePreviews();
@@ -562,6 +640,18 @@ async function saveVehicle() {
         price: parseFloat(document.getElementById('v-price').value) || 0,
         sale_price: parseFloat(document.getElementById('v-sale-price').value) || null,
         description: document.getElementById('v-description').value.trim(),
+        full_description: document.getElementById('v-full-description').value.trim(),
+        extra_info: {
+            fuel: document.getElementById('v-extra-fuel').value.trim(),
+            cc: document.getElementById('v-extra-cc').value.trim(),
+            make: document.getElementById('v-extra-make').value.trim(),
+            model: document.getElementById('v-extra-model').value.trim(),
+            gearbox: document.getElementById('v-extra-gearbox').value.trim(),
+            body_type: document.getElementById('v-extra-body').value.trim(),
+            km: document.getElementById('v-extra-km').value.trim(),
+            color: document.getElementById('v-extra-color').value.trim(),
+            year: document.getElementById('v-extra-year').value.trim()
+        },
         images: currentImages,
         in_stock: document.getElementById('v-in-stock').value === 'true',
         on_offer: document.getElementById('v-on-offer').value === 'true'

@@ -248,12 +248,81 @@
         document.head.appendChild(style);
     }
     
+    // Dynamically populate product description & extra info tabs from vehicles.json
+    async function loadSingleProductData() {
+        if (!window.location.pathname.includes('/product/')) return;
+        const slug = window.location.pathname.replace(/^\/product\//, '').replace(/\/$/, '');
+        if (!slug) return;
+
+        try {
+            const resp = await fetch('/data/vehicles.json?t=' + Math.floor(Date.now() / 60000));
+            const data = await resp.json();
+            const all = [...(data.cars || []), ...(data.motorcycles || [])];
+            const v = all.find(x => x.slug === slug || x.slug === decodeURIComponent(slug));
+            if (!v) return;
+
+            // 1. Update full description tab if provided
+            const descPanel = document.getElementById('tab-description') || document.querySelector('.woocommerce-Tabs-panel--description');
+            if (descPanel && v.full_description) {
+                descPanel.innerHTML = `<p style="white-space: pre-line; line-height: 1.8; font-size: 16px; color: #333;">${v.full_description}</p>`;
+            }
+
+            // 2. Update extra information tab if provided
+            const infoPanel = document.getElementById('tab-additional_information') || document.querySelector('.woocommerce-Tabs-panel--additional_information');
+            if (infoPanel && v.extra_info) {
+                const labels = {
+                    fuel: 'Καύσιμο',
+                    cc: 'Κυβικά',
+                    make: 'Μάρκα',
+                    model: 'Μοντέλο',
+                    gearbox: 'Σασμάν',
+                    body_type: 'Τύπος',
+                    km: 'Χιλιόμετρα',
+                    color: 'Χρώμα',
+                    year: 'Χρονολογία'
+                };
+                const rows = Object.entries(v.extra_info)
+                    .filter(([k, val]) => val && val.trim())
+                    .map(([k, val]) => `
+                        <tr class="woocommerce-product-attributes-item">
+                            <th class="woocommerce-product-attributes-item__label" style="font-weight:700;padding:10px 15px;border-bottom:1px solid #eee;width:30%">${labels[k] || k}</th>
+                            <td class="woocommerce-product-attributes-item__value" style="padding:10px 15px;border-bottom:1px solid #eee"><p style="margin:0">${val}</p></td>
+                        </tr>
+                    `).join('');
+                
+                if (rows) {
+                    infoPanel.innerHTML = `
+                        <table class="woocommerce-product-attributes shop_attributes" style="width:100%;border-collapse:collapse;margin:15px 0;">
+                            ${rows}
+                        </table>
+                    `;
+                }
+            }
+
+            // 3. Tab switching helper
+            document.querySelectorAll('.woocommerce-tabs ul.tabs li a').forEach(a => {
+                a.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').replace('#', '');
+                    document.querySelectorAll('.woocommerce-tabs ul.tabs li').forEach(li => li.classList.remove('active'));
+                    document.querySelectorAll('.woocommerce-Tabs-panel').forEach(p => p.style.display = 'none');
+                    this.parentElement.classList.add('active');
+                    const targetEl = document.getElementById(targetId);
+                    if (targetEl) targetEl.style.display = 'block';
+                });
+            });
+        } catch(e) {
+            console.warn('Error hydrating product data:', e);
+        }
+    }
+
     // Initialize
     document.addEventListener('DOMContentLoaded', async function() {
         addStyles();
         await loadProductSlugs();
         setupAddToCartButtons();
         updateCartBadge();
+        loadSingleProductData();
     });
     
     // Expose for cart page
