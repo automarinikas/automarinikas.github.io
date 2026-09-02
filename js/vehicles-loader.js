@@ -105,7 +105,7 @@
         if (!productContainer) return;
 
         productContainer.innerHTML = '';
-        productContainer.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:30px;list-style:none;padding:0;margin:20px 0;';
+        productContainer.classList.add('am-vehicle-grid');
 
         if (vehicles.length === 0) {
             productContainer.innerHTML = '<li style="grid-column:1/-1;text-align:center;padding:50px 20px;color:#666;font-size:18px;background:#f9f9f9;border-radius:8px">Δεν βρέθηκαν οχήματα που να ταιριάζουν στα κριτήρια αναζήτησης.</li>';
