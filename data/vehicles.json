@@ -62,27 +62,6 @@
       "in_stock": true
     },
     {
-      "id": 4,
-      "name": "Peugeot 107 (2007)",
-      "slug": "peugeot-107-2007",
-      "price": 6500,
-      "sale_price": null,
-      "description": "",
-      "images": [
-        "wp-content/uploads/2024/02/10-1.jpg",
-        "wp-content/uploads/2024/02/1-1.jpg",
-        "wp-content/uploads/2024/02/2-3.jpg",
-        "wp-content/uploads/2024/02/3-3.jpg",
-        "wp-content/uploads/2024/02/4-3.jpg",
-        "wp-content/uploads/2024/02/5-3.jpg",
-        "wp-content/uploads/2024/02/6-3.jpg",
-        "wp-content/uploads/2024/02/7-3.jpg",
-        "wp-content/uploads/2024/02/8-3.jpg",
-        "wp-content/uploads/2024/02/9-1.jpg"
-      ],
-      "in_stock": true
-    },
-    {
       "id": 5,
       "name": "Renault Megane (2006) 1.6",
       "slug": "renault-megane-2006",
