@@ -73,12 +73,15 @@
 
 <!-- CART CONTENT -->
 <div class="am-page-wide">
-    <h1 style="color:var(--am-primary);margin-bottom:25px">🛒 Καλάθι</h1>
+    <h1 style="color:var(--am-primary);margin-bottom:25px;display:flex;align-items:center;gap:12px;">
+        <img src="/icons/basket.png" alt="Καλάθι" style="width:34px;height:auto;object-fit:contain;">
+        <span>Καλάθι</span>
+    </h1>
     
     <div id="cart-loading" style="text-align:center;padding:40px;color:var(--am-text-light);font-size:18px">Φόρτωση καλαθιού...</div>
     
     <div id="cart-empty" class="am-empty" style="display:none">
-        <p>🛒</p>
+        <img src="/icons/basket.png" alt="Άδειο καλάθι" style="width:64px;height:auto;opacity:0.25;margin-bottom:15px;object-fit:contain;">
         <h2 style="color:var(--am-text-light)">Το καλάθι σας είναι άδειο</h2>
         <p style="color:var(--am-text-light);margin:10px 0">Δεν έχετε προσθέσει κανένα προϊόν.</p>
         <a href="/" class="btn-continue" style="margin-top:20px">← Επιστροφή στα προϊόντα</a>
