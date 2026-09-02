@@ -15,8 +15,9 @@
         bar.style.cssText = 'position:fixed;top:0;right:0;z-index:99999;display:flex;align-items:center;gap:10px;padding:8px 18px;background:rgba(15,29,123,0.95);border-bottom-left-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.2);font-family:Open Sans Condensed,sans-serif;font-size:14px;font-weight:700;';
 
         bar.innerHTML = `
-            <a href="/cart/" id="am-cart-link" style="color:#e7ff00;text-decoration:none;display:flex;align-items:center;gap:4px" title="Καλάθι">
-                🛒 <span id="am-cart-count" style="background:#e7ff00;color:#0f1d7b;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">0</span>
+            <a href="/cart/" id="am-cart-link" style="color:#e7ff00;text-decoration:none;display:flex;align-items:center;gap:4px;position:relative" title="Καλάθι">
+                <img src="/icons/basket.png" alt="Καλάθι" style="width:22px;height:22px;filter:brightness(0) invert(1)">
+                <span id="am-cart-count" style="background:#e7ff00;color:#0f1d7b;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;position:absolute;top:-6px;right:-8px">0</span>
             </a>
             <span style="color:rgba(255,255,255,0.3)">|</span>
             <span id="am-user-link"></span>
