@@ -1,0 +1,147 @@
+{
+  "cars": [
+    {
+      "id": 1,
+      "name": "Dacia Sandero (2018) 1.0",
+      "slug": "dacia-sandero-2018-1-0",
+      "price": 8200,
+      "sale_price": null,
+      "description": "1.0 ΒΕΝΖΙΝΗ",
+      "images": [
+        "wp-content/uploads/2025/04/Ανώνυμο-σχέδιο-10-1.jpg",
+        "wp-content/uploads/2025/04/2-1.jpg",
+        "wp-content/uploads/2025/04/3-1.jpg",
+        "wp-content/uploads/2025/04/4-1.jpg",
+        "wp-content/uploads/2025/04/5-1.jpg",
+        "wp-content/uploads/2025/04/6-1.jpg",
+        "wp-content/uploads/2025/04/7-1.jpg",
+        "wp-content/uploads/2025/04/8-1.jpg",
+        "wp-content/uploads/2025/04/9-1.jpg",
+        "wp-content/uploads/2025/04/10-1.jpg"
+      ],
+      "in_stock": true
+    },
+    {
+      "id": 2,
+      "name": "Fiat Punto Evo EVO EURO-5 START-STOP (2012)",
+      "slug": "fiat-punto-evo-evo-euro-5-start-stop-2012",
+      "price": 5600,
+      "sale_price": null,
+      "description": "1249 ΒΕΝΖΙΝΗ",
+      "images": [
+        "wp-content/uploads/2025/10/Ανώνυμο-σχέδιο-10.jpg",
+        "wp-content/uploads/2025/10/8-1.jpg",
+        "wp-content/uploads/2025/10/7-1.jpg",
+        "wp-content/uploads/2025/10/6-1.jpg",
+        "wp-content/uploads/2025/10/5-1.jpg",
+        "wp-content/uploads/2025/10/4-1.jpg",
+        "wp-content/uploads/2025/10/3-1.jpg",
+        "wp-content/uploads/2025/10/11-1.jpg",
+        "wp-content/uploads/2025/10/10-1.jpg"
+      ],
+      "in_stock": true
+    },
+    {
+      "id": 3,
+      "name": "Hyundai Accent (2008) 1.4",
+      "slug": "hyundai-accent-2008-1-4",
+      "price": 5500,
+      "sale_price": null,
+      "description": "1.4 ΒΕΝΖΙΝΗ",
+      "images": [
+        "wp-content/uploads/2024/06/auto-me-logo.jpg",
+        "wp-content/uploads/2024/06/2-1.jpg",
+        "wp-content/uploads/2024/06/3-1.jpg",
+        "wp-content/uploads/2024/06/4-1.jpg",
+        "wp-content/uploads/2024/06/5-1.jpg",
+        "wp-content/uploads/2024/06/6-1.jpg",
+        "wp-content/uploads/2024/06/7-1.jpg",
+        "wp-content/uploads/2024/06/8-1.jpg",
+        "wp-content/uploads/2024/06/9-1.jpg"
+      ],
+      "in_stock": true
+    },
+    {
+      "id": 4,
+      "name": "Peugeot 107 (2007)",
+      "slug": "peugeot-107-2007",
+      "price": 6500,
+      "sale_price": null,
+      "description": "",
+      "images": [
+        "wp-content/uploads/2024/02/10-1.jpg",
+        "wp-content/uploads/2024/02/1-1.jpg",
+        "wp-content/uploads/2024/02/2-3.jpg",
+        "wp-content/uploads/2024/02/3-3.jpg",
+        "wp-content/uploads/2024/02/4-3.jpg",
+        "wp-content/uploads/2024/02/5-3.jpg",
+        "wp-content/uploads/2024/02/6-3.jpg",
+        "wp-content/uploads/2024/02/7-3.jpg",
+        "wp-content/uploads/2024/02/8-3.jpg",
+        "wp-content/uploads/2024/02/9-1.jpg"
+      ],
+      "in_stock": true
+    },
+    {
+      "id": 5,
+      "name": "Renault Megane (2006) 1.6",
+      "slug": "renault-megane-2006",
+      "price": 4000,
+      "sale_price": 3750,
+      "description": "1.6 ΒΕΝΖΙΝΗ",
+      "images": [
+        "wp-content/uploads/2024/06/auto-me-logo.jpg",
+        "wp-content/uploads/2024/06/2-2.jpg",
+        "wp-content/uploads/2024/06/3-2.jpg",
+        "wp-content/uploads/2024/06/4-2.jpg",
+        "wp-content/uploads/2024/06/5-2.jpg",
+        "wp-content/uploads/2024/06/6-2.jpg",
+        "wp-content/uploads/2024/06/7-2.jpg",
+        "wp-content/uploads/2024/06/8-2.jpg",
+        "wp-content/uploads/2024/06/9-2.jpg"
+      ],
+      "in_stock": true
+    },
+    {
+      "id": 6,
+      "name": "Suzuki Jimny 4×4 (2001) 1.3",
+      "slug": "suzuki-jimny-4x4-2001-1-3",
+      "price": 5500,
+      "sale_price": null,
+      "description": "1.3 ΒΕΝΖΙΝΗ",
+      "images": [
+        "wp-content/uploads/2024/02/Ανώνυμο-σχέδιο-1-5.jpg",
+        "wp-content/uploads/2024/02/2-5.jpg",
+        "wp-content/uploads/2024/02/3-5.jpg",
+        "wp-content/uploads/2024/02/4-5.jpg",
+        "wp-content/uploads/2024/02/5-5.jpg",
+        "wp-content/uploads/2024/02/6-5.jpg",
+        "wp-content/uploads/2024/02/7-4.jpg",
+        "wp-content/uploads/2024/02/8-4.jpg",
+        "wp-content/uploads/2024/02/9-2.jpg"
+      ],
+      "in_stock": true
+    }
+  ],
+  "motorcycles": [
+    {
+      "id": 7,
+      "name": "Kymco X-Town 300i (2016)",
+      "slug": "kymco-x-town-300i-2016",
+      "price": 3100,
+      "sale_price": 2700,
+      "description": "276 CC ΒΕΝΖΙΝΗ",
+      "images": [
+        "wp-content/uploads/2025/10/Ανώνυμο-σχέδιο-10.jpg",
+        "wp-content/uploads/2025/10/2.jpg",
+        "wp-content/uploads/2025/10/3.jpg",
+        "wp-content/uploads/2025/10/4.jpg",
+        "wp-content/uploads/2025/10/5.jpg",
+        "wp-content/uploads/2025/10/6.jpg",
+        "wp-content/uploads/2025/10/7.jpg",
+        "wp-content/uploads/2025/10/8.jpg"
+      ],
+      "in_stock": true
+    }
+  ]
+}
