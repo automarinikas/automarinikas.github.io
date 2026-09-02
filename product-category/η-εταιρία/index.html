@@ -903,5 +903,77 @@ var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof H
 var TVE_Ult_Data = {"ajaxurl":"","ajax_load_action":"tve_ult_ajax_load","conversion_events_action":"tve_ult_conversion_event","shortcode_campaign_ids":[],"matched_display_settings":[],"campaign_ids":[],"post_id":141,"is_singular":true,"tu_em":"","evergreen_redirects":[]};
 /* ]]> */
 </script>
-		<script type="text/javascript" src="../../wp-content/plugins/thrive-ultimatum/js/dist/no-campaign.min.js"></script>			</body>
+		<script type="text/javascript" src="../../wp-content/plugins/thrive-ultimatum/js/dist/no-campaign.min.js"></script>			
+<script>
+/* Fix for static site: intercept Thrive form submissions */
+(function() {
+  document.addEventListener('DOMContentLoaded', function() {
+    // Find all Thrive lead gen forms
+    var forms = document.querySelectorAll('.thrv_lead_generation form');
+    forms.forEach(function(form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        var name = form.querySelector('input[name="name"]');
+        var email = form.querySelector('input[name="email"]');
+        var nameVal = name ? name.value.trim() : '';
+        var emailVal = email ? email.value.trim() : '';
+        
+        if (!emailVal) {
+          alert('Παρακαλώ εισάγετε το email σας.');
+          return;
+        }
+        
+        // Send email via mailto
+        var subject = encodeURIComponent('Ενδιαφέρον από ' + (nameVal || 'Επισκέπτη'));
+        var body = encodeURIComponent('Όνομα: ' + nameVal + '\nEmail: ' + emailVal + '\n\nΘέλω να ενημερώνομαι για νέες ευκαιρίες.');
+        window.location.href = 'mailto:info@automarinikas.gr?subject=' + subject + '&body=' + body;
+        
+        // Show success
+        var container = form.closest('.thrv_lead_generation');
+        if (container) {
+          container.innerHTML = '<div style="text-align:center;padding:30px;color:#fff;"><h3>Ευχαριστούμε!</h3><p>Θα επικοινωνήσουμε σύντομα μαζί σας.</p></div>';
+        }
+      });
+    });
+    
+    // Also intercept the button click (Thrive uses an <a> tag, not form submit)
+    var buttons = document.querySelectorAll('.tve-form-button-submit');
+    buttons.forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        var form = btn.closest('form');
+        if (form) {
+          form.dispatchEvent(new Event('submit', {cancelable: true}));
+        }
+      });
+    });
+    
+    // Suppress the Thrive error by overriding ThriveGlobal if it exists
+    if (typeof window.ThriveGlobal !== 'undefined') {
+      // Already loaded
+    }
+  });
+  
+  // Prevent Thrive's own AJAX submission from running
+  window.addEventListener('load', function() {
+    // Override jQuery AJAX for thrive form endpoints
+    if (typeof jQuery !== 'undefined') {
+      var origAjax = jQuery.ajax;
+      jQuery.ajax = function(options) {
+        if (options && options.url && (options.url === '' || options.url === '#')) {
+          // Silently fail for empty/neutralized AJAX URLs
+          return jQuery.Deferred().resolve({}).promise();
+        }
+        return origAjax.apply(this, arguments);
+      };
+    }
+  });
+})();
+</script>
+
+</body>
 </html>
