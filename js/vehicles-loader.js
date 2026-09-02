@@ -100,8 +100,13 @@
         if (vehicles.length === 0) return;
 
         const prices = vehicles.map(v => v.sale_price || v.price);
-        const minBoundary = Math.floor(Math.min(...prices) / 100) * 100;
-        const maxBoundary = Math.ceil(Math.max(...prices) / 100) * 100;
+        let minBoundary = Math.floor(Math.min(...prices) / 100) * 100;
+        let maxBoundary = Math.ceil(Math.max(...prices) / 100) * 100;
+
+        if (maxBoundary <= minBoundary) {
+            minBoundary = Math.max(0, minBoundary - 500);
+            maxBoundary = maxBoundary + 500;
+        }
 
         // Find filter widgets
         const filterWrappers = document.querySelectorAll('.price_slider_wrapper');

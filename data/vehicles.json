@@ -123,5 +123,19 @@
       "in_stock": true
     }
   ],
-  "motorcycles": []
+  "motorcycles": [
+    {
+      "id": 101,
+      "name": "Kymco X-Town 300i (2016)",
+      "slug": "kymco-x-town-300i-2016",
+      "price": 3100,
+      "sale_price": 2700,
+      "description": "300cc Scooter",
+      "images": [
+        "wp-content/uploads/2024/06/Ανώνυμο-σχέδιο-1-2.jpg"
+      ],
+      "in_stock": true,
+      "on_offer": true
+    }
+  ]
 }
