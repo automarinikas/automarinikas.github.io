@@ -84,15 +84,15 @@
         const saleTag = vehicle.on_offer ? '<span class="onsale" style="position:absolute;top:10px;left:10px;background:#e7ff00;color:#0f1d7b;padding:4px 12px;font-weight:700;font-size:14px;z-index:2;border-radius:3px">Προσφορά!</span>' : '';
 
         return `
-            <li class="product type-product" data-vehicle-id="${vehicle.id}" data-price="${vehicle.sale_price || vehicle.price}" style="list-style:none;position:relative;margin-bottom:30px;">
+            <li class="product type-product" data-vehicle-id="${vehicle.id}" data-price="${vehicle.sale_price || vehicle.price}">
                 ${saleTag}
                 <a href="${productUrl}" class="woocommerce-LoopProduct-link">
-                    <img src="${imgSrc}" alt="${vehicle.name}" class="attachment-woocommerce_thumbnail" style="width:100%;height:auto;border-radius:4px" loading="lazy" onerror="this.src='../../wp-content/uploads/2021/11/automarinikas-logo.jpg'" />
+                    <img src="${imgSrc}" alt="${vehicle.name}" class="attachment-woocommerce_thumbnail" loading="lazy" onerror="this.src='../../wp-content/uploads/2021/11/automarinikas-logo.jpg'" />
                     <h2 class="woocommerce-loop-product__title" style="font-size:16px;font-weight:600;margin:10px 0 5px;color:#333">${vehicle.name}</h2>
                 </a>
                 ${priceHTML}
                 <p style="font-size:13px;color:#666;margin:5px 0">${vehicle.description || ''}</p>
-                <a href="${productUrl}" class="button add_to_cart_button" style="display:inline-block;background:#fff;border:2px solid #333;color:#333;padding:8px 20px;text-decoration:none;font-size:14px;font-weight:600;margin-top:8px;cursor:pointer;transition:all 0.2s;border-radius:4px" onmouseover="this.style.background='#333';this.style.color='#fff'" onmouseout="this.style.background='#fff';this.style.color='#333'">Προσθήκη στο καλάθι</a>
+                <a href="${productUrl}" class="button add_to_cart_button" style="display:inline-block;background:#fff;border:2px solid #333;color:#333;padding:8px 20px;text-decoration:none;font-size:14px;font-weight:600;margin-top:auto;cursor:pointer;transition:all 0.2s;border-radius:4px;text-align:center" onmouseover="this.style.background='#333';this.style.color='#fff'" onmouseout="this.style.background='#fff';this.style.color='#333'">Προσθήκη στο καλάθι</a>
             </li>`;
     }
 
@@ -340,7 +340,7 @@
         if (!category) return;
 
         try {
-            const cacheBust = '?t=' + Math.floor(Date.now() / 60000);
+            const cacheBust = '?t=' + Date.now();
             const response = await fetch(VEHICLES_JSON_URL + cacheBust);
             if (!response.ok) throw new Error('Failed to load vehicles');
             

@@ -146,6 +146,118 @@ form.cart .quantity,
     text-transform: uppercase;
 }
 
+/* ===== BULLETPROOF VEHICLE GRID (ALWAYS STARTS TOP-LEFT, FILLS EVENLY) ===== */
+.am-vehicle-grid,
+ul.products,
+.products,
+.thrv_woocommerce_shop_products ul.products,
+.woocommerce ul.products,
+.woocommerce-page ul.products,
+.woocommerce ul.products[class*="columns-"],
+.woocommerce-page ul.products[class*="columns-"],
+ul.products.columns-2,
+ul.products.columns-3,
+ul.products.columns-4,
+ul.products.columns-5 {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 25px !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 20px 0 !important;
+    width: 100% !important;
+    float: none !important;
+    clear: both !important;
+}
+
+.am-vehicle-grid::before,
+.am-vehicle-grid::after,
+ul.products::before,
+ul.products::after,
+.products::before,
+.products::after,
+.woocommerce ul.products::before,
+.woocommerce ul.products::after,
+.woocommerce-page ul.products::before,
+.woocommerce-page ul.products::after {
+    display: none !important;
+    content: none !important;
+}
+
+.am-vehicle-grid li.product,
+ul.products li.product,
+.products li.product,
+.thrv_woocommerce_shop_products ul.products li.product,
+.woocommerce ul.products li.product,
+.woocommerce-page ul.products li.product,
+.woocommerce ul.products[class*="columns-"] li.product,
+.woocommerce-page ul.products[class*="columns-"] li.product,
+ul.products.columns-2 li.product,
+ul.products.columns-3 li.product,
+ul.products.columns-4 li.product,
+ul.products.columns-5 li.product {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    float: none !important;
+    clear: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 15px !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.am-vehicle-grid li.product:hover,
+ul.products li.product:hover,
+.products li.product:hover,
+.woocommerce ul.products li.product:hover,
+.woocommerce-page ul.products li.product:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12) !important;
+}
+
+.am-vehicle-grid li.product img,
+ul.products li.product img,
+.products li.product img,
+.woocommerce ul.products li.product img,
+.woocommerce-page ul.products li.product img {
+    width: 100% !important;
+    height: 220px !important;
+    object-fit: cover !important;
+    border-radius: 6px !important;
+    margin-bottom: 12px !important;
+    display: block !important;
+}
+
+@media (max-width: 992px) {
+    .am-vehicle-grid,
+    ul.products,
+    .products,
+    .thrv_woocommerce_shop_products ul.products,
+    .woocommerce ul.products {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .am-vehicle-grid,
+    ul.products,
+    .products,
+    .thrv_woocommerce_shop_products ul.products,
+    .woocommerce ul.products {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+}
+
 /* ===== UNIVERSAL USER / CART FLOATING BAR ===== */
 #am-user-nav {
     position: fixed;

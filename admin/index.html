@@ -683,9 +683,10 @@ async function deleteVehicle(category, id, name) {
     
     const result = await adminAPI('/admin/vehicles/' + category + '/' + id, 'DELETE');
     if (result && result.success) {
-        loadVehicles();
+        alert('✅ Το όχημα "' + name + '" διαγράφηκε επιτυχώς.');
+        await loadVehicles();
     } else {
-        alert('Σφάλμα διαγραφής');
+        alert('Σφάλμα: ' + (result?.error || 'Αποτυχία διαγραφής'));
     }
 }
 
