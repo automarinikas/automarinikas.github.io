@@ -6,7 +6,7 @@
 (function() {
     'use strict';
 
-    const VEHICLES_JSON_URL = '/data/vehicles.json';
+    const VEHICLES_JSON_URL = (window.SHOP_CONFIG && window.SHOP_CONFIG.VEHICLES_JSON) || '/data/vehicles.json';
 
     // Detect which category page we're on
     function getCurrentCategory() {

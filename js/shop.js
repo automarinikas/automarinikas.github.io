@@ -5,7 +5,7 @@
 (function() {
     'use strict';
     
-    const API_BASE = 'https://shop.expanding.land/api';
+    const API_BASE = (window.SHOP_CONFIG && window.SHOP_CONFIG.API_BASE) || 'https://shop.expanding.land/api';
     
     // Product ID mapping - loaded dynamically from vehicles.json
     let PRODUCT_SLUGS = {};
