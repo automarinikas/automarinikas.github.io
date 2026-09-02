@@ -614,36 +614,75 @@ async function loadOrders() {
     
     data.orders.forEach(o => {
         const items = JSON.parse(o.items_json || '[]');
-        const itemsText = items.map(i => i.name + ' x' + i.quantity).join(', ');
+        const itemsText = items.map(i => i.name + (i.quantity > 1 ? ' x' + i.quantity : '')).join(', ');
         const statusClass = 'status-' + (o.status || 'pending');
-        const statusText = {'pending':'Νέα','contacted':'Επικοινωνία','completed':'Ολοκληρώθηκε','cancelled':'Ακυρώθηκε'}[o.status] || o.status;
+        const statusLabels = {
+            'pending': '⏳ Νέα',
+            'contacted': '📞 Επικοινωνία',
+            'completed': '✅ Πουλήθηκε (Ολοκληρώθηκε)',
+            'cancelled': '❌ Ακυρώθηκε'
+        };
+        const statusText = statusLabels[o.status] || o.status;
         
+        let actionButtons = '';
+        if (o.status !== 'completed') {
+            actionButtons += `<button class="btn btn-success" style="padding:4px 8px;font-size:12px;margin-right:4px;" onclick="acceptOrder(${o.id})" title="Αποδοχή & Σήμανση Οχήματος ως Πουλημένο">✅ Αποδοχή</button>`;
+        }
+        if (o.status !== 'cancelled') {
+            actionButtons += `<button class="btn btn-warning" style="padding:4px 8px;font-size:12px;margin-right:4px;" onclick="cancelOrder(${o.id})" title="Ακύρωση & Επαναφορά Οχήματος σε Διαθέσιμο">❌ Ακύρωση</button>`;
+        }
+        actionButtons += `<button class="btn btn-danger" style="padding:4px 8px;font-size:12px;" onclick="deleteOrder(${o.id})" title="Διαγραφή Παραγγελίας">🗑️</button>`;
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${o.id}</td>
+            <td>#${o.id}</td>
             <td>${new Date(o.created_at).toLocaleDateString('el-GR')}</td>
-            <td>${o.customer_name || '-'}</td>
+            <td><strong>${o.customer_name || '-'}</strong></td>
             <td>${o.customer_email || '-'}</td>
             <td>${o.customer_phone || '-'}</td>
             <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis">${itemsText}</td>
             <td style="font-weight:700;color:var(--am-primary)">${formatPrice(o.total)}</td>
             <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-            <td>
-                <select onchange="updateOrderStatus(${o.id}, this.value)" style="padding:5px;background:var(--am-card);color:var(--am-text);border:2px solid var(--am-border);border-radius:6px;font-family:Open Sans Condensed,sans-serif">
-                    <option value="pending" ${o.status==='pending'?'selected':''}>Νέα</option>
-                    <option value="contacted" ${o.status==='contacted'?'selected':''}>Επικοινωνία</option>
-                    <option value="completed" ${o.status==='completed'?'selected':''}>Ολοκληρώθηκε</option>
-                    <option value="cancelled" ${o.status==='cancelled'?'selected':''}>Ακυρώθηκε</option>
-                </select>
+            <td style="white-space:nowrap;">
+                ${actionButtons}
             </td>
         `;
         tbody.appendChild(tr);
     });
 }
 
-async function updateOrderStatus(orderId, status) {
-    await adminAPI('/admin/orders/' + orderId, 'PUT', { status });
-    loadOrders();
+async function acceptOrder(orderId) {
+    if (!confirm(`Αποδοχή παραγγελίας #${orderId};\n\nΤο όχημα της παραγγελίας θα σημανθεί αυτόματα ως ΠΟΥΛΗΜΕΝΟ (Sold) και ΔΕΝ θα εμφανίζεται πλέον στο κατάστημα.`)) return;
+    const res = await adminAPI('/admin/orders/' + orderId, 'PUT', { status: 'completed' });
+    if (res && res.success) {
+        alert('✅ Η παραγγελία έγινε δεκτή και το όχημα σημειώθηκε ως πουλημένο.');
+        loadOrders();
+        loadVehicles();
+    } else {
+        alert('Σφάλμα: ' + (res?.error || 'Αποτυχία ενημέρωσης'));
+    }
+}
+
+async function cancelOrder(orderId) {
+    if (!confirm(`Ακύρωση παραγγελίας #${orderId};\n\nΑν το όχημα είχε σημανθεί ως πουλημένο, θα επανέλθει αυτόματα ως ΔΙΑΘΕΣΙΜΟ στο κατάστημα.`)) return;
+    const res = await adminAPI('/admin/orders/' + orderId, 'PUT', { status: 'cancelled' });
+    if (res && res.success) {
+        alert('✅ Η παραγγελία ακυρώθηκε και το όχημα επανήλθε ως διαθέσιμο.');
+        loadOrders();
+        loadVehicles();
+    } else {
+        alert('Σφάλμα: ' + (res?.error || 'Αποτυχία ενημέρωσης'));
+    }
+}
+
+async function deleteOrder(orderId) {
+    if (!confirm(`Οριστική διαγραφή παραγγελίας #${orderId};`)) return;
+    const res = await adminAPI('/admin/orders/' + orderId, 'DELETE');
+    if (res && res.success) {
+        loadOrders();
+    } else {
+        alert('Σφάλμα διαγραφής');
+    }
 }
 
 // ==================== UTILS ====================
@@ -658,11 +697,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (nameInput && slugInput) {
         nameInput.addEventListener('input', () => {
             if (!document.getElementById('modal-edit-id').value) {
-                slugInput.value = nameInput.value.toLowerCase()
-                    .replace(/[()]/g, '')
-                    .replace(/[^a-z0-9\-]/g, '-')
-                    .replace(/-+/g, '-')
-                    .replace(/^-|-$/g, '');
+                slugInput.value = generateSlug(nameInput.value);
             }
         });
     }
@@ -682,17 +717,29 @@ async function loadUsers() {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${u.id}</td>
-            <td>${u.name}</td>
+            <td><strong>${u.name}</strong></td>
             <td>${u.email}</td>
             <td>${u.phone || '-'}</td>
-            <td>${u.email_verified ? '<span style="color:#2e7d32">✅</span>' : '<span style="color:#e65100">❌</span>'}</td>
+            <td>${u.email_verified ? '<span style="color:#2e7d32">✅ Ναι</span>' : '<span style="color:#e65100">❌ Όχι</span>'}</td>
             <td>${u.created_at ? new Date(u.created_at).toLocaleDateString('el-GR') : '-'}</td>
-            <td>
-                <button class="btn btn-primary" onclick="resetUserPassword('${u.email.replace(/'/g, "\\'")}')">🔑 Reset</button>
+            <td style="white-space:nowrap;">
+                <button class="btn btn-primary" style="padding:4px 8px;font-size:12px;margin-right:4px;" onclick="resetUserPassword('${u.email.replace(/'/g, "\\'")}')">🔑 Reset</button>
+                <button class="btn btn-danger" style="padding:4px 8px;font-size:12px;" onclick="deleteUser(${u.id}, '${u.email.replace(/'/g, "\\'")}')">🗑️ Διαγραφή</button>
             </td>
         `;
         tbody.appendChild(tr);
     });
+}
+
+async function deleteUser(userId, email) {
+    if (!confirm(`Οριστική διαγραφή χρήστη "${email}";\n\nΑυτή η ενέργεια δεν μπορεί να αναιρεθεί.`)) return;
+    const res = await adminAPI('/admin/users/' + userId, 'DELETE');
+    if (res && res.success) {
+        alert(`✅ Ο χρήστης ${email} διαγράφηκε επιτυχώς.`);
+        loadUsers();
+    } else {
+        alert('Σφάλμα: ' + (res?.error || 'Αποτυχία διαγραφής χρήστη'));
+    }
 }
 
 async function resetUserPassword(email) {
