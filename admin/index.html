@@ -218,10 +218,11 @@
         <input type="hidden" id="modal-edit-id">
         
         <label>Όνομα *</label>
-        <input type="text" id="v-name" placeholder="π.χ. Fiat Punto (2012)">
+        <input type="text" id="v-name" placeholder="π.χ. Fiat Punto (2012)" oninput="if(!document.getElementById('modal-edit-id').value) document.getElementById('v-slug').value = generateSlug(this.value)">
         
-        <label>Slug (URL) *</label>
+        <label>Slug (Σύνδεσμος URL) *</label>
         <input type="text" id="v-slug" placeholder="π.χ. fiat-punto-2012">
+        <small style="display:block;color:#666;margin-top:-6px;margin-bottom:12px;font-size:12px">📌 Η διεύθυνση URL της σελίδας του οχήματος (π.χ. automarinikas.github.io/product/<strong>fiat-punto-2012</strong>/). Συμπληρώνεται αυτόματα.</small>
         
         <label>Τιμή (€) *</label>
         <input type="number" id="v-price" placeholder="5000">
@@ -265,6 +266,17 @@
 const API_BASE = (window.SHOP_CONFIG && window.SHOP_CONFIG.API_BASE) || 'https://shop.expanding.land/api';
 let authToken = null;
 let vehiclesData = null;
+
+function generateSlug(text) {
+    const greekMap = {
+        'α':'a','β':'v','γ':'g','δ':'d','ε':'e','ζ':'z','η':'i','θ':'th','ι':'i','κ':'k','λ':'l','μ':'m',
+        'ν':'n','ξ':'x','ο':'o','π':'p','ρ':'r','σ':'s','ς':'s','τ':'t','υ':'y','φ':'f','χ':'ch','ψ':'ps','ω':'o',
+        'ά':'a','έ':'e','ή':'i','ί':'i','ό':'o','ύ':'y','ώ':'o','ϊ':'i','ϋ':'y','ΐ':'i','ΰ':'y'
+    };
+    return text.toLowerCase().split('').map(c => greekMap[c] || c).join('')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
 
 // ==================== AUTH ====================
 function togglePassword() {
