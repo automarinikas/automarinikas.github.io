@@ -46,6 +46,17 @@ h3 { font-size: 24px; }
 a { color: var(--am-primary-dark); text-decoration: none; }
 a:hover { color: var(--am-primary); }
 
+/* ===== HIDE QUANTITY SELECTORS (- 1 +) FOR VEHICLES ===== */
+.quantity,
+.tve-woo-quantity-button,
+form.cart .quantity,
+.woocommerce .quantity,
+.woocommerce-variation-add-to-cart .quantity,
+.cart-qty,
+.product-quantity {
+    display: none !important;
+}
+
 /* ===== SITE TOP BAR ===== */
 .am-top-bar, [data-css="tve-u-17ce6bfe87e"] {
     background: #004aad !important;
