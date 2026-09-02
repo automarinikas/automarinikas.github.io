@@ -1,22 +1,24 @@
 /**
  * Automarinikas Shop - Cart & API Client
- * Connects to the shop API on the Hetzner server
+ * Auto-loads product data from vehicles.json — no hardcoded IDs needed
  */
 (function() {
     'use strict';
     
     const API_BASE = 'https://shop.expanding.land/api';
     
-    // Product ID mapping - matches the database
-    const PRODUCT_SLUGS = {
-        'dacia-sandero-2018-1-0': 1,
-        'fiat-punto-evo-evo-euro-5-start-stop-2012': 2,
-        'hyundai-accent-2008-1-4': 3,
-        'peugeot-107-2007': 4,
-        'renault-megane-2006': 5,
-        'suzuki-jimny-4x4-2001-1-3': 6,
-        'kymco-x-town-300i-2016': 7
-    };
+    // Product ID mapping - loaded dynamically from vehicles.json
+    let PRODUCT_SLUGS = {};
+    
+    // Load slug→ID mapping from vehicles.json
+    async function loadProductSlugs() {
+        try {
+            const resp = await fetch('/data/vehicles.json?t=' + Math.floor(Date.now() / 60000));
+            const data = await resp.json();
+            const all = [...(data.cars || []), ...(data.motorcycles || [])];
+            all.forEach(v => { PRODUCT_SLUGS[v.slug] = v.id; });
+        } catch (e) { console.warn('Could not load vehicles.json for slugs'); }
+    }
     
     // Session management via localStorage (since cross-origin cookies are tricky)
     function getSessionId() {
@@ -247,8 +249,9 @@
     }
     
     // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
         addStyles();
+        await loadProductSlugs();
         setupAddToCartButtons();
         updateCartBadge();
     });
