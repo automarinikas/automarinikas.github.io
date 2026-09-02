@@ -103,7 +103,10 @@
     <div class="login-box">
         <h1>🔐 Automarinikas Admin</h1>
         <input type="text" id="login-user" placeholder="Username" autocomplete="username">
-        <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password">
+        <div style="position:relative">
+            <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" onkeypress="if(event.key==='Enter')doLogin()">
+            <span id="pass-toggle" onclick="togglePassword()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;user-select:none;color:#aaa" title="Εμφάνιση/Απόκρυψη">👁️</span>
+        </div>
         <button onclick="doLogin()">Σύνδεση</button>
         <div id="login-error" class="login-error">Λάθος στοιχεία. Δοκιμάστε ξανά.</div>
     </div>
@@ -213,6 +216,18 @@ let authToken = null;
 let vehiclesData = null;
 
 // ==================== AUTH ====================
+function togglePassword() {
+    const input = document.getElementById('login-pass');
+    const toggle = document.getElementById('pass-toggle');
+    if (input.type === 'password') {
+        input.type = 'text';
+        toggle.textContent = '🔒';
+    } else {
+        input.type = 'password';
+        toggle.textContent = '👁️';
+    }
+}
+
 function doLogin() {
     const user = document.getElementById('login-user').value;
     const pass = document.getElementById('login-pass').value;
@@ -232,8 +247,11 @@ function doLogin() {
             document.getElementById('login-error').style.display = 'block';
         }
     })
-    .catch(() => {
-        document.getElementById('login-error').style.display = 'block';
+    .catch((err) => {
+        const errEl = document.getElementById('login-error');
+        errEl.textContent = '⚠️ Σφάλμα σύνδεσης με τον server. Ελέγξτε αν λειτουργεί το API.';
+        errEl.style.display = 'block';
+        console.error('Login error:', err);
     });
 }
 
