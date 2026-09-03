@@ -70,6 +70,8 @@ form.cart .quantity,
     flex-wrap: wrap;
     gap: 15px;
     border-bottom: 2px solid var(--am-accent);
+    position: relative;
+    z-index: 102;
 }
 .am-top-bar span, .am-top-bar a, [data-css="tve-u-17ce6bfe87e"] a, [data-css="tve-u-17ce6bfe87e"] span {
     color: var(--am-white) !important;
@@ -87,6 +89,8 @@ form.cart .quantity,
     background: #ffffff;
     text-align: center;
     padding: 15px 20px;
+    position: relative;
+    z-index: 101;
 }
 .am-logo-banner a {
     display: inline-block;
@@ -114,6 +118,17 @@ form.cart .quantity,
     align-items: center;
     gap: 35px;
     flex-wrap: wrap;
+    position: relative;
+    z-index: 100;
+}
+
+/* Override Thrive LP negative margin that hides our nav */
+.tve_wrap_all,
+#tcb_landing_page {
+    margin-top: 0 !important;
+}
+[data-css="tve-u-162717cb621"] {
+    margin-top: 0 !important;
 }
 .am-nav-bar a,
 li.menu-item a,
@@ -185,6 +200,8 @@ li.tve-state-active span {
     padding: 25px 20px;
     font-size: 14px;
     font-weight: 400;
+    position: relative;
+    z-index: 50;
 }
 .am-footer a {
     color: rgba(255,255,255,0.9);
