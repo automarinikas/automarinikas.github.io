@@ -890,3 +890,13 @@ ul.products li.product img,
     animation: none !important;
 }
 
+/* ===== Hide ar-contactus red notification badge ===== */
+#arcontactus .arcu-badge,
+.arcu-widget .arcu-badge,
+.arcu-message-button .arcu-badge,
+#arcontactus [class*="badge"],
+.arcu-widget .pulsation,
+.arcu-widget .arcu-unread {
+    display: none !important;
+}
+
