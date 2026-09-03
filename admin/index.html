@@ -287,22 +287,15 @@
             <p style="color:var(--am-text-light);font-size:12px;margin-top:5px">JPG, PNG, WebP — μέχρι 10MB</p>
             <input type="file" id="image-file-input" multiple accept="image/*" style="display:none" onchange="handleImageSelect(this.files)">
         </div>
-        <div id="image-previews" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px"></div>
+        <div id="image-previews" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(90px, 1fr));gap:10px;margin-bottom:10px"></div>
         <input type="hidden" id="v-images-data" value="[]">
         
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="display:grid;grid-template-columns:1fr;gap:12px;">
             <div>
                 <label>Διαθέσιμο</label>
                 <select id="v-in-stock">
                     <option value="true">Ναι - Διαθέσιμο</option>
                     <option value="false">Όχι - Πουλήθηκε</option>
-                </select>
-            </div>
-            <div>
-                <label>Προσφορά!</label>
-                <select id="v-on-offer">
-                    <option value="false">Όχι</option>
-                    <option value="true">Ναι - Badge «Προσφορά!»</option>
                 </select>
             </div>
         </div>
@@ -578,7 +571,7 @@ function renderImagePreviews() {
     container.innerHTML = '';
     currentImages.forEach((url, i) => {
         const div = document.createElement('div');
-        div.style.cssText = 'position:relative;width:100px;height:100px;border-radius:6px;overflow:hidden;border:1px solid var(--am-border)';
+        div.style.cssText = 'position:relative;width:100%;aspect-ratio:1;border-radius:6px;overflow:hidden;border:1px solid var(--am-border);min-width:0';
         const fullUrl = url.startsWith('http') ? url : (API_BASE + '/' + url.replace(/^\//, ''));
         div.innerHTML = `
             <img src="${fullUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%2260%22 x=%2230%22 font-size=%2240%22>📷</text></svg>'">
@@ -664,7 +657,6 @@ function openAddModal(category) {
     document.getElementById('v-extra-color').value = '';
     document.getElementById('v-extra-year').value = '';
     document.getElementById('v-in-stock').value = 'true';
-    document.getElementById('v-on-offer').value = 'false';
     currentImages = [];
     renderImagePreviews();
     document.getElementById('vehicle-modal').classList.add('active');
@@ -697,7 +689,6 @@ function editVehicle(category, id) {
     document.getElementById('v-extra-year').value = extra.year || '';
 
     document.getElementById('v-in-stock').value = v.in_stock !== false ? 'true' : 'false';
-    document.getElementById('v-on-offer').value = v.on_offer ? 'true' : 'false';
     currentImages = [...(v.images || [])];
     renderImagePreviews();
     document.getElementById('vehicle-modal').classList.add('active');
@@ -731,7 +722,7 @@ async function saveVehicle() {
         },
         images: currentImages,
         in_stock: document.getElementById('v-in-stock').value === 'true',
-        on_offer: document.getElementById('v-on-offer').value === 'true'
+        on_offer: (parseFloat(document.getElementById('v-sale-price').value) > 0 && parseFloat(document.getElementById('v-sale-price').value) < parseFloat(document.getElementById('v-price').value))
     };
     
     if (!vehicle.name || !vehicle.price) {
