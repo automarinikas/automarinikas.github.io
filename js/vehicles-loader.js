@@ -63,11 +63,11 @@
         return words.every(w => haystack.includes(w));
     }
     // Resolve image URL — handles API uploads, local files, and full URLs
-    const _serverBase = ((window.SHOP_CONFIG && window.SHOP_CONFIG.API_BASE) || '').replace(/\/api\/?$/, '');
+    const _apiBase = ((window.SHOP_CONFIG && window.SHOP_CONFIG.API_BASE) || 'https://shop.expanding.land/api');
     function resolveImgUrl(img) {
         if (!img) return '/wp-content/uploads/2021/11/automarinikas-logo.jpg';
         if (img.startsWith('http')) return img;
-        if (img.startsWith('/uploads/')) return _serverBase + img;
+        if (img.startsWith('/uploads/')) return _apiBase + img;
         return '/' + img.replace(/^\//, '');
     }
 

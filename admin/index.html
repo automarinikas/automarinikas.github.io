@@ -527,7 +527,7 @@ function renderVehicleGrid(category, vehicles) {
     vehicles.forEach(v => {
         const firstImg = v.images && v.images.length > 0 ? v.images[0] : '';
         const imgSrc = firstImg 
-            ? (firstImg.startsWith('http') ? firstImg : firstImg.startsWith('/uploads/') ? API_BASE.replace(/\/api\/?$/, '') + firstImg : '/' + firstImg) 
+            ? (firstImg.startsWith('http') ? firstImg : firstImg.startsWith('/uploads/') ? API_BASE + firstImg : '/' + firstImg) 
             : '';
         const priceHtml = v.sale_price 
             ? `<span class="price-old">${formatPrice(v.price)}</span> ${formatPrice(v.sale_price)}`
