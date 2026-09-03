@@ -210,8 +210,14 @@ async function apiCall(endpoint, method, body) {
     const opts = { method: method||'GET', headers: {'Content-Type':'application/json'} };
     if (token) opts.headers['Authorization'] = 'Bearer ' + token;
     if (body) opts.body = JSON.stringify(body);
-    const resp = await fetch(API_BASE + endpoint, opts);
-    return resp.json();
+    try {
+        const resp = await fetch(API_BASE + endpoint, opts);
+        const data = await resp.json();
+        return data;
+    } catch(err) {
+        console.error('API call error:', err);
+        return { success: false, error: 'Σφάλμα επικοινωνίας με τον server' };
+    }
 }
 
 async function doUserLogin(e) {
@@ -220,8 +226,8 @@ async function doUserLogin(e) {
     err.style.display='none'; btn.disabled=true; btn.textContent='⏳';
     try {
         const r = await apiCall('/login','POST',{email:document.getElementById('login-email').value,password:document.getElementById('login-password').value});
-        if(r.success){localStorage.setItem('user_token',r.token);localStorage.setItem('user_data',JSON.stringify(r.user));showProfile(r.user);}
-        else{err.textContent=r.error||'Λάθος στοιχεία';err.style.display='block';}
+        if(r && r.success){localStorage.setItem('user_token',r.token);localStorage.setItem('user_data',JSON.stringify(r.user));showProfile(r.user);}
+        else{err.textContent=r?.error||'Λάθος στοιχεία';err.style.display='block';}
     } catch(e){err.textContent='⚠️ Σφάλμα σύνδεσης';err.style.display='block';}
     btn.disabled=false; btn.textContent='Σύνδεση';
 }
@@ -231,9 +237,28 @@ async function doUserRegister(e) {
     const btn=document.getElementById('reg-btn'), err=document.getElementById('reg-error');
     err.style.display='none'; btn.disabled=true; btn.textContent='⏳';
     try {
-        const r = await apiCall('/register','POST',{name:document.getElementById('reg-name').value,email:document.getElementById('reg-email').value,phone:document.getElementById('reg-phone').value,password:document.getElementById('reg-password').value});
-        if(r.success){localStorage.setItem('user_token',r.token);localStorage.setItem('user_data',JSON.stringify(r.user));showProfile(r.user);}
-        else{err.textContent=r.error||'Σφάλμα';err.style.display='block';}
+        const name = document.getElementById('reg-name').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const phone = document.getElementById('reg-phone').value.trim();
+        const password = document.getElementById('reg-password').value;
+
+        if (!name || !email || !password) {
+            err.textContent = 'Παρακαλώ συμπληρώστε όλα τα απαραίτητα πεδία.';
+            err.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Δημιουργία Λογαριασμού';
+            return;
+        }
+
+        const r = await apiCall('/register','POST',{ name, email, phone, password });
+        if(r && r.success){
+            localStorage.setItem('user_token',r.token);
+            localStorage.setItem('user_data',JSON.stringify(r.user));
+            showProfile(r.user);
+        } else {
+            err.textContent=r?.error||'Σφάλμα δημιουργίας λογαριασμού';
+            err.style.display='block';
+        }
     } catch(e){err.textContent='⚠️ Σφάλμα σύνδεσης';err.style.display='block';}
     btn.disabled=false; btn.textContent='Δημιουργία Λογαριασμού';
 }
