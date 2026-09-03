@@ -65,7 +65,7 @@
         .vehicle-card .stock-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
         .stock-badge.in-stock { background: #e8f5e9; color: #2e7d32; }
         .stock-badge.sold { background: #ffebee; color: #c62828; }
-        .no-img { width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; background: #f0f2f8; font-size: 64px; color: #aab; }
+        .no-img { width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f0f2f8 0%, #e8eaf0 100%); font-size: 48px; color: #bbc; }
         
         /* Buttons */
         .btn { padding: 8px 16px; border: none; border-radius: 100px; cursor: pointer; font-size: 14px; font-weight: 700; transition: all 0.2s; font-family: 'Open Sans Condensed', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -111,6 +111,7 @@
         .stat-card .label { color: var(--am-text-light); font-size: 14px; margin-top: 5px; font-weight: 700; text-transform: uppercase; }
         
         .no-img { width: 100%; height: 200px; background: #e8eaf6; display: flex; align-items: center; justify-content: center; color: #9fa8da; font-size: 48px; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 <link rel='stylesheet' href='../css/shared.css' type='text/css' media='all' />
 </head>
@@ -541,7 +542,7 @@ function renderVehicleGrid(category, vehicles) {
         card.style.position = 'relative';
         card.innerHTML = `
             ${offerBadge}
-            ${imgSrc ? `<img src="${imgSrc}" alt="${v.name}" onerror="this.outerHTML='<div class=no-img>🚗</div>'">` : '<div class="no-img">🚗</div>'}
+            ${imgSrc ? `<img src="${imgSrc}" alt="${v.name}" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div class=no-img>🚗</div>')">` : '<div class="no-img">🚗</div>'}
             <div class="info">
                 <div class="name">${v.name}</div>
                 <div class="price">${priceHtml}</div>
@@ -575,13 +576,30 @@ function renderImagePreviews() {
     container.innerHTML = '';
     currentImages.forEach((url, i) => {
         const div = document.createElement('div');
-        div.style.cssText = 'position:relative;width:100%;aspect-ratio:1;border-radius:6px;overflow:hidden;border:1px solid var(--am-border);min-width:0';
+        div.style.cssText = 'position:relative;width:100%;aspect-ratio:1;border-radius:6px;overflow:hidden;border:1px solid var(--am-border);min-width:0;background:#f0f2f8';
         const fullUrl = url.startsWith('http') ? url : (API_BASE + '/' + url.replace(/^\//, ''));
-        div.innerHTML = `
-            <img src="${fullUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%2260%22 x=%2230%22 font-size=%2240%22>📷</text></svg>'">
-            <button onclick="removeImage(${i})" style="position:absolute;top:2px;right:2px;background:rgba(198,40,40,0.9);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;line-height:22px;padding:0" title="Αφαίρεση">✕</button>
-            ${i > 0 ? `<button onclick="moveImageUp(${i})" style="position:absolute;bottom:2px;left:2px;background:rgba(15,29,123,0.8);color:#fff;border:none;border-radius:4px;width:22px;height:22px;font-size:10px;cursor:pointer;padding:0" title="Μετακίνηση αριστερά">◀</button>` : ''}
-        `;
+        const img = document.createElement('img');
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover';
+        img.onerror = function() { this.style.display='none'; this.parentElement.innerHTML += '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px">📷</div>'; };
+        img.src = fullUrl;
+        div.appendChild(img);
+        
+        // Remove button
+        const removeBtn = document.createElement('button');
+        removeBtn.innerHTML = '✕';
+        removeBtn.style.cssText = 'position:absolute;top:2px;right:2px;background:rgba(198,40,40,0.9);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;line-height:22px;padding:0';
+        removeBtn.onclick = () => { removeImage(i); };
+        div.appendChild(removeBtn);
+        
+        // Move left button
+        if (i > 0) {
+            const moveBtn = document.createElement('button');
+            moveBtn.innerHTML = '◀';
+            moveBtn.style.cssText = 'position:absolute;bottom:2px;left:2px;background:rgba(15,29,123,0.8);color:#fff;border:none;border-radius:4px;width:22px;height:22px;font-size:10px;cursor:pointer;padding:0';
+            moveBtn.onclick = () => { moveImageUp(i); };
+            div.appendChild(moveBtn);
+        }
+        
         container.appendChild(div);
     });
     document.getElementById('v-images-data').value = JSON.stringify(currentImages);
@@ -622,10 +640,20 @@ async function uploadFile(file) {
 }
 
 async function handleImageSelect(files) {
+    const container = document.getElementById('image-previews');
+    // Show loading placeholders
     for (const file of files) {
         if (!file.type.startsWith('image/')) continue;
         if (file.size > 10 * 1024 * 1024) { alert('Μέγιστο μέγεθος 10MB'); continue; }
+        
+        // Add loading placeholder
+        const placeholder = document.createElement('div');
+        placeholder.style.cssText = 'width:100%;aspect-ratio:1;border-radius:6px;border:2px dashed var(--am-primary);display:flex;align-items:center;justify-content:center;background:#f0f2f8;min-width:0';
+        placeholder.innerHTML = '<div style="text-align:center"><div style="font-size:24px;animation:spin 1s linear infinite">⏳</div><div style="font-size:11px;color:#888;margin-top:4px">Ανέβασμα...</div></div>';
+        container.appendChild(placeholder);
+        
         const url = await uploadFile(file);
+        container.removeChild(placeholder);
         if (url) {
             currentImages.push(url);
             renderImagePreviews();
