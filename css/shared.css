@@ -900,3 +900,271 @@ ul.products li.product img,
     display: none !important;
 }
 
+
+/* ===================================================================
+   RESPONSIVE DESIGN - MOBILE & TABLET
+   =================================================================== */
+
+/* --- TABLET (max-width: 1024px) --- */
+@media (max-width: 1024px) {
+    .am-top-bar, [data-css="tve-u-17ce6bfe87e"] {
+        padding: 8px 15px !important;
+        font-size: 12px;
+        gap: 8px;
+    }
+    
+    .am-logo-banner img {
+        max-height: 80px;
+    }
+    
+    .am-nav-bar {
+        gap: 15px;
+        padding: 10px 15px;
+    }
+    .am-nav-bar a,
+    li.menu-item a,
+    .tve_menu_item a {
+        font-size: 18px;
+        letter-spacing: 1px;
+    }
+    
+    /* Vehicle grid: 2 columns on tablet */
+    .am-vehicle-grid,
+    ul.products,
+    .products,
+    .thrv_woocommerce_shop_products ul.products,
+    .woocommerce ul.products,
+    .woocommerce-page ul.products,
+    ul.products.columns-2,
+    ul.products.columns-3,
+    ul.products.columns-4,
+    ul.products.columns-5 {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px !important;
+    }
+    
+    h1 { font-size: 28px; }
+    h2 { font-size: 22px; }
+    h3 { font-size: 20px; }
+    
+    /* Thrive wrapper sections */
+    .thrv_wrapper {
+        max-width: 100% !important;
+    }
+    
+    /* Price filter slider */
+    #am-price-filter-root {
+        padding: 0 5px;
+    }
+}
+
+/* --- MOBILE (max-width: 768px) --- */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+    
+    .am-top-bar, [data-css="tve-u-17ce6bfe87e"] {
+        flex-direction: column;
+        padding: 8px 10px !important;
+        font-size: 11px;
+        gap: 4px;
+        text-align: center;
+    }
+    .am-top-bar div, .am-top-bar span,
+    [data-css="tve-u-17ce6bfe87e"] div {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .am-logo-banner {
+        padding: 10px 15px;
+    }
+    .am-logo-banner a {
+        max-width: 280px;
+    }
+    .am-logo-banner img {
+        max-height: 60px;
+    }
+    
+    .am-nav-bar {
+        gap: 8px;
+        padding: 8px 10px;
+        flex-wrap: wrap;
+    }
+    .am-nav-bar a,
+    li.menu-item a,
+    .tve_menu_item a {
+        font-size: 14px;
+        letter-spacing: 0.5px;
+        padding: 4px 6px;
+    }
+    
+    /* Vehicle grid: 1 column on mobile */
+    .am-vehicle-grid,
+    ul.products,
+    .products,
+    .thrv_woocommerce_shop_products ul.products,
+    .woocommerce ul.products,
+    .woocommerce-page ul.products,
+    ul.products.columns-2,
+    ul.products.columns-3,
+    ul.products.columns-4,
+    ul.products.columns-5 {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+    
+    /* Product cards */
+    li.product,
+    .product.type-product {
+        padding: 10px !important;
+    }
+    li.product img,
+    .product.type-product img {
+        max-height: 250px;
+    }
+    
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; }
+    h3 { font-size: 16px; }
+    
+    /* User nav */
+    #am-user-nav {
+        right: 5px !important;
+        gap: 8px !important;
+    }
+    #am-user-nav a {
+        font-size: 12px !important;
+    }
+    #am-user-nav img {
+        width: 20px !important;
+        height: 20px !important;
+    }
+    
+    /* Cart page */
+    .cart-table th,
+    .cart-table td {
+        padding: 8px !important;
+        font-size: 13px;
+    }
+    .cart-product img {
+        width: 50px !important;
+        height: 40px !important;
+    }
+    .cart-product {
+        gap: 8px !important;
+    }
+    .cart-totals {
+        min-width: auto !important;
+    }
+    .cart-summary {
+        flex-direction: column !important;
+    }
+    
+    /* Sidebar should hide on mobile */
+    #theme-sidebar-section,
+    aside.sidebar-section {
+        display: none !important;
+    }
+    
+    /* Make main content full width when sidebar hides */
+    .theme-section.content-section,
+    .tar-main-content,
+    #tve_editor {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    /* Guarantee bar */
+    .am-guarantee-bar,
+    .guarantee-bar {
+        font-size: 14px;
+        padding: 12px 10px;
+    }
+    
+    /* Footer */
+    .am-footer,
+    footer {
+        font-size: 12px;
+        padding: 15px 10px;
+    }
+    
+    /* Sort dropdown */
+    .woocommerce-ordering select,
+    form.woocommerce-ordering {
+        width: 100% !important;
+        max-width: 100%;
+    }
+    
+    /* Brand carousel */
+    .am-brand-carousel {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+    .am-brand-carousel img {
+        min-width: 60px !important;
+        max-height: 40px !important;
+    }
+    
+    /* Thrive page sections */
+    .thrv-page-section,
+    .tve-page-section-in {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+    
+    /* Thrive flex columns - stack vertically */
+    .tcb-flex-row {
+        flex-direction: column !important;
+    }
+    .tcb-flex-col {
+        max-width: 100% !important;
+        flex-basis: 100% !important;
+    }
+}
+
+/* --- SMALL MOBILE (max-width: 480px) --- */
+@media (max-width: 480px) {
+    .am-top-bar, [data-css="tve-u-17ce6bfe87e"] {
+        font-size: 10px;
+        padding: 6px 8px !important;
+    }
+    
+    .am-nav-bar a,
+    li.menu-item a,
+    .tve_menu_item a {
+        font-size: 12px;
+        letter-spacing: 0;
+        padding: 3px 4px;
+    }
+    
+    .am-logo-banner a {
+        max-width: 200px;
+    }
+    .am-logo-banner img {
+        max-height: 45px;
+    }
+    
+    h1 { font-size: 18px; }
+    h2 { font-size: 16px; }
+    
+    /* Cart table: hide subtotal column */
+    .cart-table th:nth-child(4),
+    .cart-table td:nth-child(4) {
+        display: none;
+    }
+}
+
+/* ===== PHONE LINK STYLES ===== */
+.am-top-bar a[href^="tel:"],
+[data-css="tve-u-17ce6bfe87e"] a[href^="tel:"] {
+    color: var(--am-white) !important;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.am-top-bar a[href^="tel:"]:hover,
+[data-css="tve-u-17ce6bfe87e"] a[href^="tel:"]:hover {
+    color: var(--am-accent) !important;
+    text-decoration: underline;
+}
