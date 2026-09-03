@@ -62,13 +62,19 @@
         const words = q.split(/\s+/);
         return words.every(w => haystack.includes(w));
     }
+    // Resolve image URL — handles API uploads, local files, and full URLs
+    const _serverBase = ((window.SHOP_CONFIG && window.SHOP_CONFIG.API_BASE) || '').replace(/\/api\/?$/, '');
+    function resolveImgUrl(img) {
+        if (!img) return '/wp-content/uploads/2021/11/automarinikas-logo.jpg';
+        if (img.startsWith('http')) return img;
+        if (img.startsWith('/uploads/')) return _serverBase + img;
+        return '/' + img.replace(/^\//, '');
+    }
 
     // Create HTML for a single product card
     function createProductCard(vehicle) {
         const firstImg = vehicle.images && vehicle.images.length > 0 ? vehicle.images[0] : '';
-        const imgSrc = firstImg
-            ? (firstImg.startsWith('http') ? firstImg : '/' + firstImg.replace(/^\//, ''))
-            : '/wp-content/uploads/2021/11/automarinikas-logo.jpg';
+        const imgSrc = resolveImgUrl(firstImg);
 
         const productUrl = '/product/' + vehicle.slug + '/';
 

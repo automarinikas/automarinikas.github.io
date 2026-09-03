@@ -81,6 +81,9 @@
     </div>
 </div>
 
+<!-- GUARANTEE BAR -->
+<div class="am-guarantee-bar">Με την εγγύηση Automarinikas</div>
+
 <!-- FOOTER -->
 <footer class="am-footer">
     <p>© <span class="current-year">2026</span> <a href="/" style="color:inherit;text-decoration:none;font-weight:700;">Automarinikas</a> – Μεταχειρισμένα Αυτοκίνητα & Μοτοσυκλέτες, Θεσσαλονίκη</p>
@@ -133,8 +136,12 @@
         }
         
         // Images
+        const API_BASE = (window.SHOP_CONFIG && window.SHOP_CONFIG.API_BASE) || '';
+        const SERVER_BASE = API_BASE.replace(/\/api\/?$/, ''); // e.g. https://shop.expanding.land
         function getImgUrl(img) {
-            return img.startsWith('http') ? img : '/' + img.replace(/^\//, '');
+            if (img.startsWith('http')) return img;
+            if (img.startsWith('/uploads/')) return SERVER_BASE + img;
+            return '/' + img.replace(/^\//, '');
         }
         
         const mainImg = document.getElementById('product-main-img');
