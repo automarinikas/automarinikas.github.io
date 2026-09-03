@@ -287,6 +287,7 @@
             const cacheBust = '?t=' + Date.now();
             const response = await fetch(VEHICLES_JSON_URL + cacheBust);
             if (!response.ok) throw new Error('Failed to load vehicles');
+            const data = await response.json();
             
             let vehicles = [];
             if (category === 'cars') {

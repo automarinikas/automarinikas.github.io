@@ -830,3 +830,37 @@ ul.products li.product img,
     display: none !important;
 }
 
+/* ===== Override Thrive sidebar wrapper to remove blue background ===== */
+#theme-sidebar-section .thrv_contentbox_shortcode,
+#theme-sidebar-section .thrv-content-box {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 10px 5px !important;
+}
+
+#theme-sidebar-section .tve-content-box-background {
+    background: transparent !important;
+    border: none !important;
+    display: none !important;
+}
+
+#theme-sidebar-section .tve-cb {
+    background: transparent !important;
+}
+
+/* Hide empty Thrive layered nav widgets in sidebar */
+#theme-sidebar-section .thrv_woocommerce_layered_nav:empty,
+#theme-sidebar-section .thrv_widget:empty {
+    display: none !important;
+}
+
+/* Ensure sidebar doesn't overlap or cause layout issues */
+#theme-sidebar-section {
+    z-index: 10 !important;
+}
+
+#theme-sidebar-section .section-content {
+    padding: 15px 10px !important;
+}
+
