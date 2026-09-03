@@ -70,7 +70,7 @@
                 </div>
                 <div class="am-form-group">
                     <label>Τηλέφωνο</label>
-                    <input class="am-input" type="tel" id="reg-phone" placeholder="69xxxxxxxx">
+                    <input class="am-input" type="tel" id="reg-phone" placeholder="69xxxxxxxx" required>
                 </div>
                 <div class="am-form-group">
                     <label>Κωδικός</label>
@@ -331,7 +331,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     if(params.has('verify')){try{const r=await apiCall('/verify-email','POST',{token:params.get('verify')});alert(r.success?'✅ Email επιβεβαιώθηκε!':'❌ Μη έγκυρος σύνδεσμος.');}catch(e){alert('⚠️ Σφάλμα');}window.history.replaceState({},'','/my-account/');}
     if(params.has('reset')){document.getElementById('reset-token').value=params.get('reset');showAuthTab('reset');return;}
     const token=localStorage.getItem('user_token');
-    if(token){try{const d=await apiCall('/me','GET');if(d.user)showProfile(d.user);else doUserLogout();}catch(e){doUserLogout();}}
+    if(token){try{const d=await apiCall('/me','GET');if(d.user)showProfile(d.user);else if(d.error && (d.error.includes('expired') || d.error.includes('invalid') || d.error.includes('Unauthorized'))){doUserLogout();}else{/* Network error - keep logged in with cached data */const cached=localStorage.getItem('user_data');if(cached){try{showProfile(JSON.parse(cached));}catch(e){doUserLogout();}}}}catch(e){/* Network error - try cached data */const cached=localStorage.getItem('user_data');if(cached){try{showProfile(JSON.parse(cached));}catch(ex){doUserLogout();}}else{doUserLogout();}}}
 });
 </script>
 </body>

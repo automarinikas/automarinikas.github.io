@@ -222,7 +222,23 @@
         window.dispatchEvent(new Event('cartUpdated'));
     }
     
-    function showCheckoutForm() { document.getElementById('checkout-form').style.display = 'block'; document.getElementById('checkout-name').focus(); }
+    function showCheckoutForm() {
+        document.getElementById('checkout-form').style.display = 'block';
+        // Pre-fill from logged-in user data
+        try {
+            const userData = localStorage.getItem('user_data');
+            if (userData) {
+                const user = JSON.parse(userData);
+                const nameEl = document.getElementById('checkout-name');
+                const emailEl = document.getElementById('checkout-email');
+                const phoneEl = document.getElementById('checkout-phone');
+                if (user.name && !nameEl.value) nameEl.value = user.name;
+                if (user.email && !emailEl.value) emailEl.value = user.email;
+                if (user.phone && !phoneEl.value) phoneEl.value = user.phone;
+            }
+        } catch(e) { /* ignore parse errors */ }
+        document.getElementById('checkout-name').focus();
+    }
     
     async function submitOrder() {
         const name = document.getElementById('checkout-name').value.trim();
