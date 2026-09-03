@@ -93,33 +93,6 @@
       ],
       "on_offer": false,
       "in_stock": true
-    },
-    {
-      "id": 103,
-      "name": "fdssdffsd",
-      "slug": "fdssdffsd",
-      "price": 8000,
-      "sale_price": 7000,
-      "description": "fddd dgfddfg dfdfddf",
-      "full_description": "gffdffdffd",
-      "extra_info": {
-        "fuel": "fsfd",
-        "cc": "",
-        "make": "",
-        "model": "fssfdsfd",
-        "gearbox": "",
-        "body_type": "",
-        "km": "",
-        "color": "",
-        "year": ""
-      },
-      "images": [
-        "/uploads/1788397851_1713973333683.png",
-        "/uploads/1788397840_1719060909226.jpg",
-        "/uploads/1788397863_1713973333683.png"
-      ],
-      "on_offer": false,
-      "in_stock": true
     }
   ]
 }
