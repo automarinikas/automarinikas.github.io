@@ -824,3 +824,9 @@ ul.products li.product img,
     border-color: #0f1d7b !important;
     box-shadow: 0 0 0 3px rgba(15, 29, 123, 0.12) !important;
 }
+
+/* Hide WooCommerce magnifier icon on product images */
+.woocommerce-product-gallery__trigger {
+    display: none !important;
+}
+
