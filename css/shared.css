@@ -214,6 +214,23 @@ footer.am-footer {
     color: var(--am-accent);
 }
 
+/* ===== SIDEBAR ALWAYS VISIBLE (override Thrive hidden classes) ===== */
+#theme-sidebar-section.tcb-mobile-hidden,
+#theme-sidebar-section.tcb-tablet-hidden,
+aside.sidebar-section.tcb-mobile-hidden,
+aside.sidebar-section.tcb-tablet-hidden {
+    display: block !important;
+}
+#theme-sidebar-section {
+    flex-shrink: 0 !important;
+    min-width: 200px;
+}
+/* Hide off-screen trigger since sidebar is always visible */
+.tve-off-screen-sidebar-trigger,
+.tve-sidebar-close-icon {
+    display: none !important;
+}
+
 /* ===== BULLETPROOF VEHICLE GRID (ALWAYS STARTS TOP-LEFT, FILLS EVENLY) ===== */
 .am-vehicle-grid,
 ul.products,
@@ -1103,18 +1120,32 @@ li.product .woocommerce-LoopProduct-link img {
         flex-direction: column !important;
     }
     
-    /* Sidebar should hide on mobile */
+    /* Sidebar: keep visible on all screens, stack above content */
     #theme-sidebar-section,
     aside.sidebar-section {
-        display: none !important;
+        display: block !important;
+        position: relative !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        order: -1 !important;
+        padding: 10px !important;
+        margin-bottom: 10px !important;
+        float: none !important;
+    }
+    #theme-sidebar-section .section-content {
+        padding: 0 !important;
     }
     
-    /* Make main content full width when sidebar hides */
+    /* Make main content full width when sidebar stacks */
     .theme-section.content-section,
     .tar-main-content,
     #tve_editor {
         width: 100% !important;
         max-width: 100% !important;
+    }
+    .main-container {
+        flex-direction: column !important;
+        display: flex !important;
     }
     
     /* Guarantee bar */
