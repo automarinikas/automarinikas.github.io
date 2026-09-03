@@ -447,6 +447,85 @@ async function loadVehicles() {
     updateStats(data);
 }
 
+// Sync vehicles.json on GitHub with current API data
+async function syncVehiclesJSON() {
+    try {
+        // Fetch latest vehicle data from API
+        const data = await adminAPI('/admin/vehicles');
+        if (!data || data.error) {
+            console.warn('⚠️ sync: could not fetch vehicles');
+            return;
+        }
+        
+        // Build clean JSON matching vehicles.json format
+        const cleanData = {
+            cars: (data.cars || []).map(v => ({
+                id: v.id,
+                name: v.name,
+                slug: v.slug,
+                price: v.price,
+                sale_price: v.sale_price || null,
+                description: v.description || '',
+                images: v.images || [],
+                in_stock: v.in_stock !== false,
+                ...(v.on_offer ? { on_offer: true } : {})
+            })),
+            motorcycles: (data.motorcycles || []).map(v => ({
+                id: v.id,
+                name: v.name,
+                slug: v.slug,
+                price: v.price,
+                sale_price: v.sale_price || null,
+                description: v.description || '',
+                images: v.images || [],
+                in_stock: v.in_stock !== false,
+                ...(v.on_offer ? { on_offer: true } : {})
+            }))
+        };
+        
+        const jsonContent = JSON.stringify(cleanData, null, 2) + '\n';
+        const encoded = btoa(unescape(encodeURIComponent(jsonContent)));
+        
+        // Get current file SHA (required for update)
+        const GITHUB_REPO = 'automarinikas/automarinikas.github.io';
+        const FILE_PATH = 'data/vehicles.json';
+        const GITHUB_TOKEN = localStorage.getItem('github_token');
+        
+        if (!GITHUB_TOKEN) {
+            console.warn('⚠️ No GitHub token set — vehicles.json not synced. Set it via: localStorage.setItem("github_token", "YOUR_TOKEN")');
+            return;
+        }
+        
+        const shaResp = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${FILE_PATH}`, {
+            headers: { 'Authorization': 'Bearer ' + GITHUB_TOKEN }
+        });
+        const shaData = await shaResp.json();
+        
+        // Push update
+        const pushResp = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${FILE_PATH}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': 'Bearer ' + GITHUB_TOKEN,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: 'Auto-sync vehicles.json from admin panel',
+                content: encoded,
+                sha: shaData.sha
+            })
+        });
+        
+        if (pushResp.ok) {
+            console.log('✅ vehicles.json synced to GitHub');
+        } else {
+            const err = await pushResp.json();
+            console.warn('⚠️ GitHub push failed:', err.message);
+        }
+    } catch (e) {
+        console.warn('⚠️ vehicles.json sync error:', e);
+    }
+}
+
 function renderVehicleGrid(category, vehicles) {
     const grid = document.getElementById(category + '-grid');
     grid.innerHTML = '';
@@ -672,7 +751,8 @@ async function saveVehicle() {
     
     if (result && result.success) {
         closeModal();
-        loadVehicles();
+        await loadVehicles();
+        syncVehiclesJSON();
     } else {
         alert('Σφάλμα: ' + (result?.error || 'Αποτυχία αποθήκευσης'));
     }
@@ -685,6 +765,7 @@ async function deleteVehicle(category, id, name) {
     if (result && result.success) {
         alert('✅ Το όχημα "' + name + '" διαγράφηκε επιτυχώς.');
         await loadVehicles();
+        syncVehiclesJSON();
     } else {
         alert('Σφάλμα: ' + (result?.error || 'Αποτυχία διαγραφής'));
     }
