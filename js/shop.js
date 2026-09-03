@@ -107,7 +107,7 @@
         const data = await apiCall('/cart?session_id=' + getSessionId());
         if (!data) return;
         
-        const count = data.count || 0;
+        const count = (data.items || []).length;
         let badge = document.getElementById('shop-cart-badge');
         
         if (!badge) {
@@ -189,6 +189,15 @@
                 
                 if (productId) {
                     btn.textContent = '⏳';
+                    
+                    // Check if item already in cart (vehicles are unique - can't buy 2 of the same car)
+                    const cartData = await apiCall('/cart?session_id=' + getSessionId());
+                    if (cartData && cartData.items && cartData.items.some(i => i.product_id === productId)) {
+                        showNotification('Αυτό το όχημα είναι ήδη στο καλάθι σας!', 'error');
+                        btn.textContent = 'Προσθήκη στο καλάθι';
+                        return;
+                    }
+                    
                     const result = await apiCall('/cart/add', 'POST', {
                         product_id: productId,
                         quantity: 1,

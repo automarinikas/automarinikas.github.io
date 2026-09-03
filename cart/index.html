@@ -199,7 +199,7 @@
         // Update badge
         const badge = document.getElementById('am-cart-count');
         if (badge) {
-            const count = data.items.reduce((sum, i) => sum + (i.quantity || 1), 0);
+            const count = data.items.length;
             if (count > 0) {
                 badge.textContent = count;
                 badge.style.display = 'inline-flex';

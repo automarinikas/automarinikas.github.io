@@ -63,7 +63,7 @@
         fetch(API_BASE + '/cart', { credentials: 'include', headers: headers })
             .then(r => r.json())
             .then(data => {
-                const count = (data.items || []).reduce((sum, i) => sum + (i.quantity || 1), 0);
+                const count = (data.items || []).length;
                 if (count > 0) {
                     countEl.textContent = count;
                     countEl.style.display = 'inline-flex';
