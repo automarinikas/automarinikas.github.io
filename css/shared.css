@@ -864,3 +864,29 @@ ul.products li.product img,
     padding: 15px 10px !important;
 }
 
+/* ===== Ensure Google Maps section displays properly ===== */
+.thrv-google-map-embedded-code iframe {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 400px;
+    border: none;
+    display: block;
+}
+
+.thrv-google-map-embedded-code {
+    min-height: 400px;
+}
+
+.thrv-page-section .tve-page-section-in {
+    overflow: visible !important;
+}
+
+/* ===== Force Thrive animation elements to always be visible ===== */
+.tve_ea_thrive_animation,
+.tve_anim_appear {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    animation: none !important;
+}
+
