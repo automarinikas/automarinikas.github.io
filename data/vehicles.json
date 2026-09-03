@@ -92,29 +92,6 @@
         "color": "",
         "year": ""
       }
-    },
-    {
-      "id": 103,
-      "name": "daadsdasasd",
-      "slug": "daadsdasasd",
-      "price": 4000,
-      "sale_price": null,
-      "description": "",
-      "full_description": "",
-      "extra_info": {
-        "fuel": "",
-        "cc": "",
-        "make": "",
-        "model": "",
-        "gearbox": "",
-        "body_type": "",
-        "km": "",
-        "color": "",
-        "year": ""
-      },
-      "images": [],
-      "on_offer": false,
-      "in_stock": true
     }
   ]
 }
