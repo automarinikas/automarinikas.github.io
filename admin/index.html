@@ -220,9 +220,7 @@
         <label>Όνομα *</label>
         <input type="text" id="v-name" placeholder="π.χ. Fiat Punto (2012)" oninput="if(!document.getElementById('modal-edit-id').value) document.getElementById('v-slug').value = generateSlug(this.value)">
         
-        <label>Slug (Σύνδεσμος URL) *</label>
-        <input type="text" id="v-slug" placeholder="π.χ. fiat-punto-2012">
-        <small style="display:block;color:#666;margin-top:-6px;margin-bottom:12px;font-size:12px">📌 Η διεύθυνση URL της σελίδας του οχήματος (π.χ. automarinikas.github.io/product/<strong>fiat-punto-2012</strong>/). Συμπληρώνεται αυτόματα.</small>
+        <input type="hidden" id="v-slug">
         
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
             <div>
@@ -715,7 +713,7 @@ async function saveVehicle() {
     
     const vehicle = {
         name: document.getElementById('v-name').value.trim(),
-        slug: document.getElementById('v-slug').value.trim(),
+        slug: document.getElementById('v-slug').value.trim() || generateSlug(document.getElementById('v-name').value.trim()),
         price: parseFloat(document.getElementById('v-price').value) || 0,
         sale_price: parseFloat(document.getElementById('v-sale-price').value) || null,
         description: document.getElementById('v-description').value.trim(),
@@ -736,8 +734,8 @@ async function saveVehicle() {
         on_offer: document.getElementById('v-on-offer').value === 'true'
     };
     
-    if (!vehicle.name || !vehicle.slug || !vehicle.price) {
-        alert('Συμπληρώστε τα υποχρεωτικά πεδία (Όνομα, Slug, Τιμή)');
+    if (!vehicle.name || !vehicle.price) {
+        alert('Συμπληρώστε τα υποχρεωτικά πεδία (Όνομα, Τιμή)');
         return;
     }
     
