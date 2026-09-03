@@ -226,7 +226,7 @@ async function doUserLogin(e) {
     err.style.display='none'; btn.disabled=true; btn.textContent='⏳';
     try {
         const r = await apiCall('/login','POST',{email:document.getElementById('login-email').value,password:document.getElementById('login-password').value});
-        if(r && r.success){localStorage.setItem('user_token',r.token);localStorage.setItem('user_data',JSON.stringify(r.user));showProfile(r.user);}
+        if(r && r.success){localStorage.setItem('user_token',r.token);localStorage.setItem('user_data',JSON.stringify(r.user));window.location.href='/';}
         else{err.textContent=r?.error||'Λάθος στοιχεία';err.style.display='block';}
     } catch(e){err.textContent='⚠️ Σφάλμα σύνδεσης';err.style.display='block';}
     btn.disabled=false; btn.textContent='Σύνδεση';
