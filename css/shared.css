@@ -193,15 +193,19 @@ li.tve-state-active span {
 }
 
 /* ===== SITE FOOTER ===== */
-.am-footer {
-    background: var(--am-primary-dark);
-    color: rgba(255,255,255,0.7);
+.am-footer,
+footer.am-footer {
+    background: var(--am-primary-dark) !important;
+    color: rgba(255,255,255,0.8) !important;
     text-align: center;
-    padding: 25px 20px;
-    font-size: 14px;
+    padding: 15px 20px !important;
+    font-size: 13px;
     font-weight: 400;
     position: relative;
     z-index: 50;
+    min-height: 0 !important;
+    max-height: none !important;
+    height: auto !important;
 }
 .am-footer a {
     color: rgba(255,255,255,0.9);
@@ -394,15 +398,7 @@ li.product .woocommerce-LoopProduct-link img {
     border-radius: 6px !important;
 }
 
-/* ===== SITE FOOTER ===== */
-.am-footer {
-    background: var(--am-bg-dark);
-    color: rgba(255,255,255,0.6);
-    padding: 40px 20px;
-    text-align: center;
-    font-size: 14px;
-}
-.am-footer a { color: var(--am-accent); }
+/* (footer styles consolidated above) */
 
 /* ===== PAGE CONTENT ===== */
 .am-page {
@@ -1131,8 +1127,8 @@ li.product .woocommerce-LoopProduct-link img {
     /* Footer */
     .am-footer,
     footer {
-        font-size: 12px;
-        padding: 15px 10px;
+        font-size: 12px !important;
+        padding: 12px 10px !important;
     }
     
     /* Sort dropdown */
