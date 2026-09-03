@@ -37,17 +37,33 @@
         const token = localStorage.getItem('user_token');
         if (token) {
             const userData = localStorage.getItem('user_data');
+            let firstName = 'Λογαριασμός';
             if (userData) {
                 try {
                     const user = JSON.parse(userData);
-                    const firstName = (user.name || 'User').split(' ')[0];
-                    container.innerHTML = `<a href="/my-account/" style="color:#fff;text-decoration:none" title="Ο Λογαριασμός μου">👤 ${firstName}</a>`;
-                } catch(e) {
-                    container.innerHTML = `<a href="/my-account/" style="color:#fff;text-decoration:none">👤 Λογαριασμός</a>`;
-                }
-            } else {
-                container.innerHTML = `<a href="/my-account/" style="color:#fff;text-decoration:none">👤 Λογαριασμός</a>`;
+                    firstName = (user.name || 'User').split(' ')[0];
+                } catch(e) {}
             }
+            container.innerHTML = `
+                <div class="am-user-dropdown" style="position:relative;display:inline-block">
+                    <a href="javascript:void(0)" onclick="this.parentElement.classList.toggle('open')" style="color:#fff;text-decoration:none;cursor:pointer" title="Ο Λογαριασμός μου">👤 ${firstName}</a>
+                    <div class="am-user-menu" style="display:none;position:absolute;right:0;top:100%;margin-top:8px;background:#fff;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.15);min-width:180px;z-index:9999;overflow:hidden">
+                        <a href="/my-account/" style="display:block;padding:12px 18px;color:#333;text-decoration:none;font-size:14px;font-weight:600;border-bottom:1px solid #eee">👤 Ο Λογαριασμός μου</a>
+                        <a href="javascript:void(0)" onclick="localStorage.removeItem('user_token');localStorage.removeItem('user_data');window.location.reload()" style="display:block;padding:12px 18px;color:#c62828;text-decoration:none;font-size:14px;font-weight:600">🚪 Αποσύνδεση</a>
+                    </div>
+                </div>`;
+            // Toggle dropdown on click
+            const style = document.createElement('style');
+            style.textContent = '.am-user-dropdown.open .am-user-menu{display:block!important}.am-user-menu a:hover{background:#f5f5f5!important}';
+            if (!document.getElementById('am-user-dropdown-style')) {
+                style.id = 'am-user-dropdown-style';
+                document.head.appendChild(style);
+            }
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                const dd = document.querySelector('.am-user-dropdown');
+                if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+            });
         } else {
             container.innerHTML = `<a href="/my-account/" style="color:#fff;text-decoration:none" title="Σύνδεση / Εγγραφή">🔑 Σύνδεση</a>`;
         }
