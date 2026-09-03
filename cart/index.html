@@ -168,8 +168,19 @@
     async function loadCart() {
         const data = await apiCall('/cart?session_id=' + getSessionId());
         document.getElementById('cart-loading').style.display = 'none';
-        if (!data || !data.items || data.items.length === 0) { document.getElementById('cart-empty').style.display = 'block'; return; }
+        
+        if (!data || !data.items || data.items.length === 0) {
+            document.getElementById('cart-empty').style.display = 'block';
+            document.getElementById('cart-content').style.display = 'none';
+            // Update badge to 0
+            const badge = document.getElementById('am-cart-count');
+            if (badge) badge.style.display = 'none';
+            return;
+        }
+        
+        document.getElementById('cart-empty').style.display = 'none';
         document.getElementById('cart-content').style.display = 'block';
+        
         const tbody = document.getElementById('cart-items');
         tbody.innerHTML = '';
         data.items.forEach(item => {
@@ -184,6 +195,18 @@
         });
         document.getElementById('cart-subtotal').textContent = formatPrice(data.total);
         document.getElementById('cart-total').textContent = formatPrice(data.total);
+        
+        // Update badge
+        const badge = document.getElementById('am-cart-count');
+        if (badge) {
+            const count = data.items.reduce((sum, i) => sum + (i.quantity || 1), 0);
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'inline-flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
     }
     
     async function updateQty(productId, newQty) {
@@ -195,6 +218,8 @@
     async function removeItem(productId) {
         await apiCall('/cart/remove', 'DELETE', { product_id: productId, session_id: getSessionId() });
         loadCart();
+        // Notify other components (e.g. user-nav badge)
+        window.dispatchEvent(new Event('cartUpdated'));
     }
     
     function showCheckoutForm() { document.getElementById('checkout-form').style.display = 'block'; document.getElementById('checkout-name').focus(); }
