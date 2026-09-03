@@ -65,6 +65,31 @@
       ],
       "on_offer": true,
       "in_stock": true
+    },
+    {
+      "id": 105,
+      "name": "xz\\aadasasd",
+      "slug": "xz-aadasasd",
+      "price": 4000,
+      "sale_price": 3000,
+      "description": "asdasdasd",
+      "full_description": "aasdasdsad",
+      "extra_info": {
+        "fuel": "asdasdasd",
+        "cc": "2299",
+        "make": "adsasdasd",
+        "model": "",
+        "gearbox": "",
+        "body_type": "",
+        "km": "",
+        "color": "",
+        "year": ""
+      },
+      "images": [
+        "/uploads/1788402798_1700236584481.jpg"
+      ],
+      "on_offer": true,
+      "in_stock": true
     }
   ],
   "motorcycles": [
