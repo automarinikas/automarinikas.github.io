@@ -225,11 +225,32 @@ aside.sidebar-section.tcb-tablet-hidden {
     flex-shrink: 0 !important;
     min-width: 200px;
 }
+/* Prevent sidebar from sticking/overlapping content on scroll */
+#theme-sidebar-section,
+#theme-sidebar-section .tcb-flex-col,
+#theme-sidebar-section .tcb-col,
+.sidebar-section,
+.sidebar-section .tcb-flex-col,
+.sidebar-section .tcb-col,
+.tcb-flex-col:first-child {
+    position: static !important;
+    position: relative !important;
+    align-self: flex-start !important;
+}
+/* Ensure the sidebar column doesn't stick when scrolling */
+.tcb-flex-row .tcb-flex-col:first-child .tcb-col,
+.thrv_woocommerce_price_filter,
+.widget_price_filter,
+#am-price-filter-root,
+.am-filter-card {
+    position: static !important;
+}
 /* Hide off-screen trigger since sidebar is always visible */
 .tve-off-screen-sidebar-trigger,
 .tve-sidebar-close-icon {
     display: none !important;
 }
+
 
 /* ===== BULLETPROOF VEHICLE GRID (ALWAYS STARTS TOP-LEFT, FILLS EVENLY) ===== */
 .am-vehicle-grid,
