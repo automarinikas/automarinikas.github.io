@@ -9,17 +9,14 @@
       "description": "1.6 ΒΕΝΖΙΝΗ",
       "images": [
         "wp-content/uploads/2024/06/auto-me-logo.jpg",
-        "wp-content/uploads/2024/06/2-1.jpg",
-        "wp-content/uploads/2024/06/3-1.jpg",
-        "wp-content/uploads/2024/06/4-1.jpg",
-        "wp-content/uploads/2024/06/5-1.jpg",
-        "wp-content/uploads/2024/06/6-1.jpg",
-        "wp-content/uploads/2024/06/7-1.jpg",
-        "wp-content/uploads/2024/06/8-1.jpg",
-        "wp-content/uploads/2024/06/9-1.jpg",
-        "wp-content/uploads/2024/06/10.jpg",
-        "wp-content/uploads/2024/06/11.jpg",
-        "wp-content/uploads/2024/06/12.jpg"
+        "wp-content/uploads/2024/06/2-2.jpg",
+        "wp-content/uploads/2024/06/3-2.jpg",
+        "wp-content/uploads/2024/06/4-2.jpg",
+        "wp-content/uploads/2024/06/5-2.jpg",
+        "wp-content/uploads/2024/06/6-2.jpg",
+        "wp-content/uploads/2024/06/7-2.jpg",
+        "wp-content/uploads/2024/06/8-2.jpg",
+        "wp-content/uploads/2024/06/9-2.jpg"
       ],
       "in_stock": true
     },
@@ -47,24 +44,28 @@
   "motorcycles": [
     {
       "id": 101,
-      "name": "Kymco X-Town 300i (2016)",
+      "name": "Kymco3333 X-Town 300i (2016)",
       "slug": "kymco-x-town-300i-2016",
       "price": 3100,
       "sale_price": 2700,
       "description": "300cc Scooter",
       "images": [
-        "wp-content/uploads/2024/06/Ανώνυμο-σχέδιο-1-2.jpg",
-        "wp-content/uploads/2024/06/2-2.jpg",
-        "wp-content/uploads/2024/06/3-2.jpg",
-        "wp-content/uploads/2024/06/4-2.jpg",
-        "wp-content/uploads/2024/06/5-2.jpg",
-        "wp-content/uploads/2024/06/6-2.jpg",
-        "wp-content/uploads/2024/06/7-2.jpg",
-        "wp-content/uploads/2024/06/8-2.jpg",
-        "wp-content/uploads/2024/06/9-2.jpg"
+        "wp-content/uploads/2024/06/Ανώνυμο-σχέδιο-1-2.jpg"
       ],
       "in_stock": true,
-      "on_offer": true
+      "on_offer": true,
+      "full_description": "",
+      "extra_info": {
+        "fuel": "",
+        "cc": "",
+        "make": "",
+        "model": "",
+        "gearbox": "",
+        "body_type": "",
+        "km": "",
+        "color": "",
+        "year": ""
+      }
     }
   ]
 }
