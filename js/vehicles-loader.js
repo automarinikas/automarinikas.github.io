@@ -103,7 +103,8 @@
     }
 
     function renderVehicleList(vehicles) {
-        let productContainer = document.querySelector('ul.products') 
+        let productContainer = document.getElementById('am-homepage-products')
+            || document.querySelector('ul.products') 
             || document.querySelector('.products')
             || document.querySelector('.thrv_woocommerce_shop_products ul')
             || document.querySelector('.thrv_woocommerce_shop_products');
@@ -112,6 +113,15 @@
 
         productContainer.innerHTML = '';
         productContainer.classList.add('am-vehicle-grid');
+
+        // Update result count if present
+        const resultCount = document.getElementById('am-result-count')
+            || document.querySelector('.woocommerce-result-count');
+        if (resultCount) {
+            resultCount.textContent = vehicles.length > 0 
+                ? `Προβάλλονται όλα - ${vehicles.length} αποτελέσματα`
+                : '';
+        }
 
         if (vehicles.length === 0) {
             productContainer.innerHTML = '<li style="grid-column:1/-1;text-align:center;padding:50px 20px;color:#666;font-size:18px;background:#f9f9f9;border-radius:8px">Δεν βρέθηκαν οχήματα που να ταιριάζουν στα κριτήρια αναζήτησης.</li>';
