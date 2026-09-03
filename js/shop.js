@@ -108,42 +108,54 @@
         if (!data) return;
         
         const count = (data.items || []).length;
+        
+        // Update user-nav badge (#am-cart-count)
+        const amBadge = document.getElementById('am-cart-count');
+        if (amBadge) {
+            if (count > 0) {
+                amBadge.textContent = count;
+                amBadge.style.display = 'inline-flex';
+            } else {
+                amBadge.style.display = 'none';
+            }
+        }
+        
+        // Update/create the fixed badge (#shop-cart-badge)
         let badge = document.getElementById('shop-cart-badge');
         
         if (!badge) {
-            // Create cart icon in the header navigation
-            const nav = document.querySelector('.thrv-page-section .tve-cb .thrv_wrapper.thrv_text_element');
-            if (nav) {
-                badge = document.createElement('span');
-                badge.id = 'shop-cart-badge';
-                badge.style.cssText = `
-                    position: fixed;
-                    top: 70px;
-                    right: 20px;
-                    background: #f44336;
-                    color: white;
-                    border-radius: 50%;
-                    width: 28px;
-                    height: 28px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 14px;
-                    font-weight: bold;
-                    z-index: 9999;
-                    cursor: pointer;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-                `;
-                badge.title = 'Καλάθι αγορών';
-                badge.onclick = function() { window.location.href = '/cart/'; };
-                document.body.appendChild(badge);
-            }
+            badge = document.createElement('span');
+            badge.id = 'shop-cart-badge';
+            badge.style.cssText = `
+                position: fixed;
+                top: 70px;
+                right: 20px;
+                background: #f44336;
+                color: white;
+                border-radius: 50%;
+                width: 28px;
+                height: 28px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 14px;
+                font-weight: bold;
+                z-index: 9999;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            `;
+            badge.title = 'Καλάθι αγορών';
+            badge.onclick = function() { window.location.href = '/cart/'; };
+            document.body.appendChild(badge);
         }
         
         if (badge) {
             badge.textContent = count;
             badge.style.display = count > 0 ? 'flex' : 'none';
         }
+
+        // Dispatch event so other listeners (user-nav.js) can also react
+        window.dispatchEvent(new Event('cartUpdated'));
     }
     
     // Get product ID from the current page URL or a product link
