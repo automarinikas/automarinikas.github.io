@@ -60,10 +60,12 @@
         .vehicle-card .name { font-size: 16px; font-weight: 700; color: var(--am-text); margin-bottom: 8px; }
         .vehicle-card .price { font-size: 20px; font-weight: 700; color: var(--am-primary); }
         .vehicle-card .price-old { text-decoration: line-through; color: var(--am-text-light); font-size: 14px; margin-right: 8px; }
-        .vehicle-card .actions { display: flex; gap: 8px; margin-top: 12px; }
+        .vehicle-card .actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: nowrap; }
+        .vehicle-card .actions .btn { flex: 1; min-width: 0; white-space: nowrap; padding: 8px 10px; font-size: 12px; text-align: center; }
         .vehicle-card .stock-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
         .stock-badge.in-stock { background: #e8f5e9; color: #2e7d32; }
         .stock-badge.sold { background: #ffebee; color: #c62828; }
+        .no-img { width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; background: #f0f2f8; font-size: 64px; color: #aab; }
         
         /* Buttons */
         .btn { padding: 8px 16px; border: none; border-radius: 100px; cursor: pointer; font-size: 14px; font-weight: 700; transition: all 0.2s; font-family: 'Open Sans Condensed', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -522,15 +524,17 @@ function renderVehicleGrid(category, vehicles) {
     grid.innerHTML = '';
     
     vehicles.forEach(v => {
-        const imgSrc = v.images && v.images.length > 0 
-            ? '/' + v.images[0] 
+        const firstImg = v.images && v.images.length > 0 ? v.images[0] : '';
+        const imgSrc = firstImg 
+            ? (firstImg.startsWith('http') ? firstImg : '/' + firstImg) 
             : '';
         const priceHtml = v.sale_price 
             ? `<span class="price-old">${formatPrice(v.price)}</span> ${formatPrice(v.sale_price)}`
             : formatPrice(v.price);
         const stockClass = v.in_stock ? 'in-stock' : 'sold';
         const stockText = v.in_stock ? 'Διαθέσιμο' : 'Πουλήθηκε';
-        const offerBadge = v.on_offer ? '<span style="position:absolute;top:8px;left:8px;background:var(--am-accent);color:var(--am-primary);padding:3px 10px;font-weight:700;font-size:12px;border-radius:4px;z-index:2">Προσφορά!</span>' : '';
+        const isOnOffer = v.on_offer || (v.sale_price && v.sale_price < v.price);
+        const offerBadge = isOnOffer ? '<span style="position:absolute;top:8px;left:8px;background:var(--am-accent);color:var(--am-primary);padding:3px 10px;font-weight:700;font-size:12px;border-radius:4px;z-index:2">Προσφορά!</span>' : '';
         
         const card = document.createElement('div');
         card.className = 'vehicle-card';
