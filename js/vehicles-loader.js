@@ -9,6 +9,7 @@
     const VEHICLES_JSON_URL = (window.SHOP_CONFIG && window.SHOP_CONFIG.VEHICLES_JSON) || '/data/vehicles.json';
     let loadedVehicles = [];
     let currentSearchQuery = '';
+    let currentSortOrder = 'price'; // default: cheapest first
 
     // Detect which page/category we're on
     function getCurrentCategory() {
@@ -133,6 +134,57 @@
         });
     }
 
+    // Sort vehicles based on current sort order
+    function sortVehicles(vehicles) {
+        const sorted = [...vehicles];
+        switch (currentSortOrder) {
+            case 'price':
+                sorted.sort((a, b) => (a.sale_price || a.price) - (b.sale_price || b.price));
+                break;
+            case 'price-desc':
+                sorted.sort((a, b) => (b.sale_price || b.price) - (a.sale_price || a.price));
+                break;
+            case 'date':
+                sorted.sort((a, b) => (b.id || 0) - (a.id || 0));
+                break;
+            case 'popularity':
+            default:
+                sorted.sort((a, b) => (a.sale_price || a.price) - (b.sale_price || b.price));
+                break;
+        }
+        return sorted;
+    }
+
+    // Setup the WooCommerce ordering dropdown to sort dynamically
+    function setupSortDropdown() {
+        const orderForms = document.querySelectorAll('form.woocommerce-ordering');
+        orderForms.forEach(form => {
+            form.addEventListener('submit', e => { e.preventDefault(); });
+            const select = form.querySelector('select.orderby');
+            if (select) {
+                // Check URL for initial sort
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlSort = urlParams.get('orderby');
+                if (urlSort) {
+                    select.value = urlSort;
+                    currentSortOrder = urlSort;
+                }
+                select.addEventListener('change', function() {
+                    currentSortOrder = this.value;
+                    if (window.__amApplyFilter) {
+                        window.__amApplyFilter();
+                    } else {
+                        renderVehicleList(sortVehicles(loadedVehicles));
+                    }
+                    // Update URL without reload
+                    const url = new URL(window.location);
+                    url.searchParams.set('orderby', this.value);
+                    window.history.replaceState({}, '', url);
+                });
+            }
+        });
+    }
+
     // Setup interactive search input (prevents page redirect, filters instantly on typing)
     function setupLiveSearch() {
         const searchForms = document.querySelectorAll('form.woocommerce-product-search, form[role="search"], form.search-form');
@@ -245,7 +297,7 @@
                 const matchesPrice = p >= minVal && p <= maxVal;
                 return matchesPrice && matchesSearch(v, currentSearchQuery);
             });
-            renderVehicleList(filtered);
+            renderVehicleList(sortVehicles(filtered));
         }
 
         window.__amApplyFilter = applyFilterAndSearch;
@@ -314,12 +366,16 @@
                 vehicles = allVehicles.filter(v => v.slug !== currentSlug).slice(0, 4);
             }
 
-            // Sort vehicles cheapest first, exclude sold/deleted (in_stock === false)
-            loadedVehicles = vehicles
-                .filter(v => v.in_stock !== false)
-                .sort((a, b) => (a.sale_price || a.price) - (b.sale_price || b.price));
+            // Exclude sold/deleted (in_stock === false)
+            loadedVehicles = vehicles.filter(v => v.in_stock !== false);
 
-            renderVehicleList(loadedVehicles);
+            // Check URL for initial sort order
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlSort = urlParams.get('orderby');
+            if (urlSort) currentSortOrder = urlSort;
+
+            renderVehicleList(sortVehicles(loadedVehicles));
+            setupSortDropdown();
             setupLiveSearch();
             setupPriceFilter(loadedVehicles);
 
