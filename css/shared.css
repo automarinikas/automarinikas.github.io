@@ -102,7 +102,7 @@ form.cart .quantity,
     margin: 0 auto;
 }
 
-/* ===== SITE NAVIGATION BAR ===== */
+/* ===== SITE NAVIGATION BAR & MENU LINKS ===== */
 .am-nav-bar {
     background: #ffffff radial-gradient(#d6e800 15%, transparent 16%);
     background-size: 16px 16px;
@@ -115,23 +115,54 @@ form.cart .quantity,
     gap: 35px;
     flex-wrap: wrap;
 }
-.am-nav-bar a {
+.am-nav-bar a,
+li.menu-item a,
+.tve_menu_item a,
+.thrv_widget_menu a,
+.thrv-page-section nav a,
+.tve-disabled-text-inner,
+span.tve-disabled-text-inner {
     color: #4d4d4d;
-    font-family: var(--am-font);
+    font-family: var(--am-font, 'Open Sans Condensed', sans-serif) !important;
     font-size: 22px;
-    font-weight: 700;
+    font-weight: 700 !important;
     letter-spacing: 2px;
-    text-decoration: none;
+    text-decoration: none !important;
     position: relative;
     padding: 4px 10px;
     transition: color 0.2s, transform 0.2s;
 }
-.am-nav-bar a:hover {
-    color: var(--am-primary-dark);
+
+/* ENFORCE BOLD ON HOVER, ACTIVE, FOCUS — NEVER STOP BEING BOLD */
+.am-nav-bar a:hover,
+.am-nav-bar a:focus,
+.am-nav-bar a:active,
+li.menu-item a:hover,
+li.menu-item a:focus,
+li.menu-item a:active,
+li.menu-item:hover a,
+li.menu-item:hover span,
+.tve_menu_item a:hover,
+.tve_menu_item:hover a,
+.thrv_widget_menu a:hover,
+.thrv_widget_menu a:focus,
+.thrv-page-section nav a:hover,
+.thrv-page-section nav a:focus,
+.tve-state-active,
+.tve-state-active span,
+li.current-menu-item a,
+li.current-menu-item span,
+li.tve-state-active a,
+li.tve-state-active span {
+    font-weight: 700 !important;
+    color: #004aad !important;
+    text-decoration: none !important;
 }
+
 .am-nav-bar a.active {
-    color: var(--am-primary-dark);
+    color: var(--am-primary-dark) !important;
     border-bottom: 2px solid var(--am-primary-dark);
+    font-weight: 700 !important;
 }
 
 /* ===== GUARANTEE BAR ===== */
