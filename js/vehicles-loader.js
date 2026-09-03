@@ -121,32 +121,40 @@
         });
     }
 
-    // Setup interactive search input (prevents page redirect, filters live)
+    // Setup interactive search input (prevents page redirect, filters instantly on typing)
     function setupLiveSearch() {
-        const searchForms = document.querySelectorAll('form.woocommerce-product-search, form[role="search"]');
+        const searchForms = document.querySelectorAll('form.woocommerce-product-search, form[role="search"], form.search-form');
         searchForms.forEach(form => {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                const input = form.querySelector('input[type="search"], input[name="s"], .search-field');
-                if (input) {
-                    currentSearchQuery = input.value;
-                    if (window.__amApplyFilter) window.__amApplyFilter();
-                }
                 return false;
             });
         });
 
-        const searchInputs = document.querySelectorAll('input.search-field, input[type="search"], input[name="s"]');
+        const searchInputs = document.querySelectorAll('.am-live-search-input, input.search-field, input[type="search"], input[name="s"], textarea.search-field');
         searchInputs.forEach(input => {
-            input.placeholder = 'Αναζήτηση οχήματος...';
-            input.addEventListener('input', function() {
+            input.setAttribute('autocomplete', 'off');
+            input.setAttribute('spellcheck', 'false');
+            input.placeholder = '🔍 Αναζήτηση οχήματος...';
+
+            const onInput = function() {
                 currentSearchQuery = this.value;
                 if (window.__amApplyFilter) window.__amApplyFilter();
+            };
+
+            input.addEventListener('input', onInput);
+            input.addEventListener('keyup', onInput);
+            input.addEventListener('change', onInput);
+            input.addEventListener('search', onInput);
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                }
             });
         });
     }
 
-    // Initialize smooth, glitch-free live interactive price filter
+    // Initialize smooth, glitch-free, 100% instant dual-range price slider
     function setupPriceFilter(vehicles) {
         if (!vehicles || vehicles.length === 0) return;
 
@@ -163,144 +171,63 @@
         }
 
         // Locate widget target
-        const widgetContainer = document.querySelector('.thrv_woocommerce_price_filter') 
+        const widgetContainer = document.getElementById('am-price-filter-root')
+            || document.querySelector('.thrv_woocommerce_price_filter') 
             || document.querySelector('.widget_price_filter') 
             || document.querySelector('.price_slider_wrapper');
         
         if (!widgetContainer) return;
 
-        // Inject Styles once
-        if (!document.getElementById('am-slider-styles')) {
-            const style = document.createElement('style');
-            style.id = 'am-slider-styles';
-            style.textContent = `
-                .am-price-filter-box {
-                    padding: 5px 0 15px;
-                    font-family: var(--am-font, 'Open Sans Condensed', sans-serif);
-                    user-select: none;
-                }
-                .am-slider-track-wrap {
-                    position: relative;
-                    height: 32px;
-                    display: flex;
-                    align-items: center;
-                    margin: 8px 0 12px;
-                }
-                .am-slider-bg-bar {
-                    position: absolute;
-                    left: 0;
-                    right: 0;
-                    height: 8px;
-                    background: #e2e8f0;
-                    border-radius: 4px;
-                }
-                .am-slider-active-bar {
-                    position: absolute;
-                    height: 8px;
-                    background: #004aad;
-                    border-radius: 4px;
-                    left: 0%;
-                    width: 100%;
-                }
-                .am-slider-input {
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    width: 100%;
-                    height: 32px;
-                    -webkit-appearance: none;
-                    appearance: none;
-                    background: transparent;
-                    pointer-events: none;
-                    margin: 0;
-                    outline: none;
-                }
-                .am-slider-input::-webkit-slider-thumb {
-                    -webkit-appearance: none;
-                    appearance: none;
-                    pointer-events: auto;
-                    width: 22px;
-                    height: 22px;
-                    border-radius: 50%;
-                    background: #004aad;
-                    border: 3px solid #e7ff00;
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-                    cursor: grab;
-                    transition: transform 0.1s ease;
-                }
-                .am-slider-input::-webkit-slider-thumb:active {
-                    cursor: grabbing;
-                    transform: scale(1.2);
-                }
-                .am-slider-input::-moz-range-thumb {
-                    pointer-events: auto;
-                    width: 22px;
-                    height: 22px;
-                    border-radius: 50%;
-                    background: #004aad;
-                    border: 3px solid #e7ff00;
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-                    cursor: grab;
-                    border: none;
-                }
-                .am-slider-input::-webkit-slider-runnable-track {
-                    -webkit-appearance: none;
-                    background: transparent;
-                }
-                .am-slider-input::-moz-range-track {
-                    background: transparent;
-                }
-                #am-btn-filter:hover {
-                    background: #0f1d7b !important;
-                }
-            `;
-            document.head.appendChild(style);
-        }
-
-        // Replace widget contents with clean custom HTML
+        // Render clean custom HTML with Dual Range Slider
         widgetContainer.innerHTML = `
-            <div class="am-price-filter-box">
-                <h3 style="margin: 0 0 10px; font-size: 20px; font-weight: 700; color: #1a1a2e; text-transform: uppercase;">Τιμή</h3>
-                <div class="am-slider-track-wrap">
-                    <div class="am-slider-bg-bar"></div>
-                    <div class="am-slider-active-bar" id="am-slider-active-bar"></div>
-                    <input type="range" class="am-slider-input" id="am-range-min" min="${minBoundary}" max="${maxBoundary}" value="${minBoundary}" step="50" style="z-index: 11;">
-                    <input type="range" class="am-slider-input" id="am-range-max" min="${minBoundary}" max="${maxBoundary}" value="${maxBoundary}" step="50" style="z-index: 12;">
+            <div class="am-filter-card">
+                <div class="am-filter-header">
+                    <span class="am-filter-title">Εύρος Τιμής</span>
+                    <button type="button" class="am-reset-btn" id="am-reset-filters">Επαναφορά</button>
                 </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
-                    <button type="button" id="am-btn-filter" style="background: #004aad; color: #ffffff; border: none; border-radius: 4px; padding: 7px 16px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s;">Φιλτράρισμα</button>
-                    <div style="font-size: 14px; font-weight: 700; color: #333;">
-                        Τιμή: <span id="am-label-from" style="color: #004aad">${formatPriceInt(minBoundary)} €</span> &mdash; <span id="am-label-to" style="color: #004aad">${formatPriceInt(maxBoundary)} €</span>
-                    </div>
+                
+                <div class="am-price-badge-row">
+                    <span class="am-price-val" id="am-val-min">${formatPriceInt(minBoundary)} €</span>
+                    <span class="am-price-sep">έως</span>
+                    <span class="am-price-val" id="am-val-max">${formatPriceInt(maxBoundary)} €</span>
+                </div>
+
+                <div class="am-range-slider-container">
+                    <div class="am-range-track"></div>
+                    <div class="am-range-selected" id="am-range-selected"></div>
+                    <input type="range" id="am-slider-min" min="${minBoundary}" max="${maxBoundary}" value="${minBoundary}" step="50">
+                    <input type="range" id="am-slider-max" min="${minBoundary}" max="${maxBoundary}" value="${maxBoundary}" step="50">
                 </div>
             </div>
         `;
 
-        const rangeMin = document.getElementById('am-range-min');
-        const rangeMax = document.getElementById('am-range-max');
-        const activeBar = document.getElementById('am-slider-active-bar');
-        const labelFrom = document.getElementById('am-label-from');
-        const labelTo = document.getElementById('am-label-to');
-        const btnFilter = document.getElementById('am-btn-filter');
+        const sliderMin = document.getElementById('am-slider-min');
+        const sliderMax = document.getElementById('am-slider-max');
+        const rangeSelected = document.getElementById('am-range-selected');
+        const valMin = document.getElementById('am-val-min');
+        const valMax = document.getElementById('am-val-max');
+        const resetBtn = document.getElementById('am-reset-filters');
+
+        function updateSliderVisuals(minVal, maxVal) {
+            const total = maxBoundary - minBoundary || 1;
+            const leftPct = Math.max(0, Math.min(100, ((minVal - minBoundary) / total) * 100));
+            const rightPct = Math.max(0, Math.min(100, ((maxVal - minBoundary) / total) * 100));
+            
+            if (rangeSelected) {
+                rangeSelected.style.left = leftPct + '%';
+                rangeSelected.style.width = Math.max(0, rightPct - leftPct) + '%';
+            }
+            if (valMin) valMin.textContent = formatPriceInt(minVal) + ' €';
+            if (valMax) valMax.textContent = formatPriceInt(maxVal) + ' €';
+        }
 
         function applyFilterAndSearch() {
-            const minVal = parseInt(rangeMin.value);
-            const maxVal = parseInt(rangeMax.value);
+            const minVal = parseInt(sliderMin ? sliderMin.value : minBoundary);
+            const maxVal = parseInt(sliderMax ? sliderMax.value : maxBoundary);
 
-            // Update Track Bar
-            const total = maxBoundary - minBoundary || 1;
-            const leftPct = ((minVal - minBoundary) / total) * 100;
-            const rightPct = ((maxVal - minBoundary) / total) * 100;
-            if (activeBar) {
-                activeBar.style.left = leftPct + '%';
-                activeBar.style.width = (rightPct - leftPct) + '%';
-            }
+            updateSliderVisuals(minVal, maxVal);
 
-            // Update Labels
-            if (labelFrom) labelFrom.textContent = formatPriceInt(minVal) + ' €';
-            if (labelTo) labelTo.textContent = formatPriceInt(maxVal) + ' €';
-
-            // Filter vehicles by price AND search query
+            // Filter vehicles by price AND search query instantaneously
             const filtered = loadedVehicles.filter(v => {
                 const p = v.sale_price || v.price;
                 const matchesPrice = p >= minVal && p <= maxVal;
@@ -311,27 +238,40 @@
 
         window.__amApplyFilter = applyFilterAndSearch;
 
-        // Live input handlers
-        rangeMin.addEventListener('input', () => {
-            if (parseInt(rangeMin.value) > parseInt(rangeMax.value) - 100) {
-                rangeMin.value = parseInt(rangeMax.value) - 100;
-            }
-            rangeMin.style.zIndex = '13';
-            rangeMax.style.zIndex = '12';
-            applyFilterAndSearch();
-        });
+        // Instant live slider handlers
+        if (sliderMin && sliderMax) {
+            sliderMin.addEventListener('input', function() {
+                let minVal = parseInt(this.value);
+                let maxVal = parseInt(sliderMax.value);
+                if (minVal > maxVal - 50) {
+                    this.value = maxVal - 50;
+                }
+                this.style.zIndex = '5';
+                sliderMax.style.zIndex = '4';
+                applyFilterAndSearch();
+            });
 
-        rangeMax.addEventListener('input', () => {
-            if (parseInt(rangeMax.value) < parseInt(rangeMin.value) + 100) {
-                rangeMax.value = parseInt(rangeMin.value) + 100;
-            }
-            rangeMax.style.zIndex = '13';
-            rangeMin.style.zIndex = '12';
-            applyFilterAndSearch();
-        });
+            sliderMax.addEventListener('input', function() {
+                let minVal = parseInt(sliderMin.value);
+                let maxVal = parseInt(this.value);
+                if (maxVal < minVal + 50) {
+                    this.value = minVal + 50;
+                }
+                this.style.zIndex = '5';
+                sliderMin.style.zIndex = '4';
+                applyFilterAndSearch();
+            });
+        }
 
-        if (btnFilter) {
-            btnFilter.addEventListener('click', applyFilterAndSearch);
+        // Reset button
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function() {
+                if (sliderMin) sliderMin.value = minBoundary;
+                if (sliderMax) sliderMax.value = maxBoundary;
+                currentSearchQuery = '';
+                document.querySelectorAll('.am-live-search-input, input.search-field, input[type="search"]').forEach(inp => inp.value = '');
+                applyFilterAndSearch();
+            });
         }
 
         // Initial apply
