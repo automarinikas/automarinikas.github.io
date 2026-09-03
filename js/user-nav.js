@@ -88,9 +88,25 @@
 
     window.addEventListener('cartUpdated', updateCartCount);
 
+    function updateCopyright() {
+        const year = new Date().getFullYear();
+        document.querySelectorAll('.current-year, [data-shortcode-name*="Year"]').forEach(el => {
+            el.textContent = year;
+        });
+        document.querySelectorAll('footer p, .am-footer p').forEach(p => {
+            if (p.textContent.includes('©')) {
+                p.textContent = p.textContent.replace(/©\s*\d{4}/, `© ${year}`);
+            }
+        });
+    }
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', createUserNav);
+        document.addEventListener('DOMContentLoaded', () => {
+            createUserNav();
+            updateCopyright();
+        });
     } else {
         createUserNav();
+        updateCopyright();
     }
 })();
