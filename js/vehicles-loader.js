@@ -10,7 +10,7 @@
     let loadedVehicles = [];
     let currentSearchQuery = '';
 
-    // Detect which category page we're on
+    // Detect which page/category we're on
     function getCurrentCategory() {
         const path = window.location.pathname;
         if (path.includes('μεταχειρισμένα-αυτοκίνητα') || path.includes('%CE%BC%CE%B5%CF%84%CE%B1%CF%87%CE%B5%CE%B9%CF%81%CE%B9%CF%83%CE%BC%CE%AD%CE%BD%CE%B1-%CE%B1%CF%85%CF%84%CE%BF%CE%BA%CE%AF%CE%BD%CE%B7%CF%84%CE%B1')) {
@@ -19,7 +19,11 @@
         if (path.includes('μεταχειρισμένες-μοτοσυκλέτες') || path.includes('%CE%BC%CE%B5%CF%84%CE%B1%CF%87%CE%B5%CE%B9%CF%81%CE%B9%CF%83%CE%BC%CE%AD%CE%BD%CE%B5%CF%82-%CE%BC%CE%BF%CF%84%CE%BF%CF%83%CF%85%CE%BA%CE%BB%CE%AD%CF%84%CE%B5%CF%82')) {
             return 'motorcycles';
         }
-        return null;
+        if (path.includes('/product/')) {
+            return 'related';
+        }
+        // Homepage / Root
+        return 'all';
     }
 
     // Format price in Greek Euro format
@@ -61,10 +65,10 @@
     // Create HTML for a single product card
     function createProductCard(vehicle) {
         const imgSrc = vehicle.images && vehicle.images.length > 0
-            ? '../../' + vehicle.images[0].replace(/^\//, '')
-            : '../../wp-content/uploads/2021/11/automarinikas-logo.jpg';
+            ? '/' + vehicle.images[0].replace(/^\//, '')
+            : '/wp-content/uploads/2021/11/automarinikas-logo.jpg';
 
-        const productUrl = '../../product/' + vehicle.slug + '/';
+        const productUrl = '/product/' + vehicle.slug + '/';
 
         let priceHTML;
         if (vehicle.sale_price) {
@@ -87,7 +91,7 @@
             <li class="product type-product" data-vehicle-id="${vehicle.id}" data-price="${vehicle.sale_price || vehicle.price}">
                 ${saleTag}
                 <a href="${productUrl}" class="woocommerce-LoopProduct-link">
-                    <img src="${imgSrc}" alt="${vehicle.name}" class="attachment-woocommerce_thumbnail" loading="lazy" onerror="this.src='../../wp-content/uploads/2021/11/automarinikas-logo.jpg'" />
+                    <img src="${imgSrc}" alt="${vehicle.name}" class="attachment-woocommerce_thumbnail" loading="lazy" onerror="this.src='/wp-content/uploads/2021/11/automarinikas-logo.jpg'" />
                     <h2 class="woocommerce-loop-product__title" style="font-size:16px;font-weight:600;margin:10px 0 5px;color:#333">${vehicle.name}</h2>
                 </a>
                 ${priceHTML}
@@ -344,10 +348,20 @@
             const response = await fetch(VEHICLES_JSON_URL + cacheBust);
             if (!response.ok) throw new Error('Failed to load vehicles');
             
-            const data = await response.json();
-            const vehicles = data[category] || [];
+            let vehicles = [];
+            if (category === 'cars') {
+                vehicles = data.cars || [];
+            } else if (category === 'motorcycles') {
+                vehicles = data.motorcycles || [];
+            } else if (category === 'all') {
+                vehicles = [...(data.cars || []), ...(data.motorcycles || [])];
+            } else if (category === 'related') {
+                const currentSlug = window.location.pathname.split('/').filter(Boolean).pop();
+                const allVehicles = [...(data.cars || []), ...(data.motorcycles || [])];
+                vehicles = allVehicles.filter(v => v.slug !== currentSlug).slice(0, 4);
+            }
 
-            // Sort vehicles cheapest first
+            // Sort vehicles cheapest first, exclude sold/deleted (in_stock === false)
             loadedVehicles = vehicles
                 .filter(v => v.in_stock !== false)
                 .sort((a, b) => (a.sale_price || a.price) - (b.sale_price || b.price));
@@ -356,7 +370,7 @@
             setupLiveSearch();
             setupPriceFilter(loadedVehicles);
 
-            console.log(`Dynamic vehicles: Loaded & initialized live search & price filter for ${loadedVehicles.length} ${category}`);
+            console.log(`Dynamic vehicles: Loaded & initialized ${loadedVehicles.length} vehicles for ${category}`);
         } catch (err) {
             console.error('Dynamic vehicles: Error loading', err);
         }
