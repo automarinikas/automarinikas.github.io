@@ -254,7 +254,7 @@ async function doUserRegister(e) {
         if(r && r.success){
             localStorage.setItem('user_token',r.token);
             localStorage.setItem('user_data',JSON.stringify(r.user));
-            showProfile(r.user);
+            window.location.href='/';
         } else {
             err.textContent=r?.error||'Σφάλμα δημιουργίας λογαριασμού';
             err.style.display='block';
