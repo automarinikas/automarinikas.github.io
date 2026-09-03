@@ -549,11 +549,17 @@ function renderVehicleGrid(category, vehicles) {
                 <span class="stock-badge ${stockClass}">${stockText}</span>
                 <p style="color:#888;font-size:13px;margin-top:5px">${v.description || ''}</p>
                 <div class="actions">
-                    <button class="btn btn-primary" onclick="editVehicle('${category}', ${v.id})">✏️ Επεξεργασία</button>
-                    <button class="btn btn-danger" onclick="deleteVehicle('${category}', ${v.id}, '${v.name.replace(/'/g, "\\'")}')">🗑️ Διαγραφή</button>
+                    <button class="btn btn-primary" data-action="edit" data-cat="${category}" data-id="${v.id}">✏️ Επεξεργασία</button>
+                    <button class="btn btn-danger" data-action="delete" data-cat="${category}" data-id="${v.id}" data-name="${(v.name || '').replace(/"/g, '&quot;')}">🗑️ Διαγραφή</button>
                 </div>
             </div>
         `;
+        // Bind events via JS (safer than inline onclick with special chars)
+        card.querySelector('[data-action="edit"]').addEventListener('click', () => editVehicle(category, v.id));
+        card.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
+            const btn = e.currentTarget;
+            deleteVehicle(btn.dataset.cat, parseInt(btn.dataset.id), btn.dataset.name, btn);
+        });
         grid.appendChild(card);
     });
 }
@@ -779,16 +785,37 @@ async function saveVehicle() {
     }
 }
 
-async function deleteVehicle(category, id, name) {
+async function deleteVehicle(category, id, name, btnElement) {
     if (!confirm('Διαγραφή "' + name + '";\n\nΑυτή η ενέργεια δεν μπορεί να αναιρεθεί.')) return;
     
-    const result = await adminAPI('/admin/vehicles/' + category + '/' + id, 'DELETE');
-    if (result && result.success) {
-        alert('✅ Το όχημα "' + name + '" διαγράφηκε επιτυχώς.');
-        await loadVehicles();
-        syncVehiclesJSON();
-    } else {
-        alert('Σφάλμα: ' + (result?.error || 'Αποτυχία διαγραφής'));
+    // Disable button to prevent double-click
+    if (btnElement) {
+        btnElement.disabled = true;
+        btnElement.textContent = '⏳';
+    }
+    
+    try {
+        const result = await adminAPI('/admin/vehicles/' + category + '/' + id, 'DELETE');
+        console.log('Delete result for', category, id, ':', result);
+        
+        if (result && result.success) {
+            alert('✅ Το όχημα "' + name + '" διαγράφηκε επιτυχώς.');
+            await loadVehicles();
+            await syncVehiclesJSON();
+        } else {
+            alert('Σφάλμα: ' + (result?.error || 'Αποτυχία διαγραφής'));
+            if (btnElement) {
+                btnElement.disabled = false;
+                btnElement.textContent = '🗑️ Διαγραφή';
+            }
+        }
+    } catch(e) {
+        console.error('Delete error:', e);
+        alert('Σφάλμα δικτύου κατά τη διαγραφή');
+        if (btnElement) {
+            btnElement.disabled = false;
+            btnElement.textContent = '🗑️ Διαγραφή';
+        }
     }
 }
 
