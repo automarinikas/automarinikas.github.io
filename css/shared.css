@@ -281,6 +281,18 @@ ul.products li.product img,
     border-radius: 6px !important;
     margin-bottom: 12px !important;
     display: block !important;
+    max-height: 220px !important;
+    min-height: 220px !important;
+}
+
+/* Ensure all product thumbnail images are constrained regardless of class */
+li.product img.attachment-woocommerce_thumbnail,
+li.product img.wp-post-image,
+li.product .woocommerce-LoopProduct-link img {
+    width: 100% !important;
+    height: 220px !important;
+    max-height: 220px !important;
+    object-fit: cover !important;
 }
 
 @media (max-width: 992px) {

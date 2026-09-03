@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automarinikas</title>
+    <link rel="icon" href="/wp-content/uploads/2023/10/cropped-auto.jpg" sizes="32x32">
+    <link rel="stylesheet" href="/css/shared.css">
+    <style>
+        .product-page { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
+        .product-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        @media(max-width: 768px) { .product-layout { grid-template-columns: 1fr; } }
+        .product-gallery { position: relative; }
+        .product-gallery .main-img { width: 100%; border-radius: 8px; aspect-ratio: 4/3; object-fit: cover; border: 1px solid #eee; }
+        .product-thumbnails { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+        .product-thumbnails img { width: 70px; height: 70px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; }
+        .product-thumbnails img:hover, .product-thumbnails img.active { border-color: var(--am-primary); }
+        .product-info h1 { font-size: 28px; font-weight: 700; color: var(--am-primary-dark); margin: 0 0 15px; }
+        .product-price { font-size: 26px; font-weight: 700; color: var(--am-primary); margin-bottom: 20px; }
+        .product-price del { color: #999; font-size: 18px; margin-right: 10px; }
+        .product-desc { color: #555; font-size: 16px; line-height: 1.6; margin-bottom: 20px; }
+        .product-badge { display: inline-block; background: #e7ff00; color: #0f1d7b; padding: 4px 14px; font-weight: 700; font-size: 14px; border-radius: 4px; margin-bottom: 15px; }
+        .product-specs { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .product-specs th, .product-specs td { padding: 10px 15px; border-bottom: 1px solid #eee; text-align: left; }
+        .product-specs th { font-weight: 700; width: 35%; background: #f8f9ff; }
+        .product-add-btn { display: inline-block; background: var(--am-primary); color: #fff; padding: 14px 40px; border: none; border-radius: 6px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s; text-transform: uppercase; }
+        .product-add-btn:hover { background: var(--am-primary-dark); }
+        .not-found-page { text-align: center; padding: 80px 20px; }
+        .not-found-page h1 { font-size: 72px; color: var(--am-primary); margin: 0; }
+        .not-found-page p { font-size: 18px; color: #666; margin: 15px 0; }
+    </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="am-top-bar">
+    <span>Ωράριο λειτουργίας : 09:00 - 20:00</span>
+    <span><a href="tel:+306932794575">6932794575</a> - <a href="tel:+306943626656">6943626656</a> - <a href="tel:+302310476590">2310 476 590</a></span>
+    <a href="https://goo.gl/maps/4pafvfrZ3C5kfk8k8" target="_blank">Διεύθυνση Απόλλωνος, Πυλαία-Χορτιάτης 555 35</a>
+</div>
+
+<!-- LOGO BANNER -->
+<div class="am-logo-banner">
+    <a href="/"><img src="/wp-content/uploads/2021/11/automarinikas-logo.jpg" alt="Automarinikas"></a>
+</div>
+
+<!-- NAV BAR -->
+<nav class="am-nav-bar">
+    <a href="/product-category/%CE%BC%CE%B5%CF%84%CE%B1%CF%87%CE%B5%CE%B9%CF%81%CE%B9%CF%83%CE%BC%CE%AD%CE%BD%CE%B1-%CE%B1%CF%85%CF%84%CE%BF%CE%BA%CE%AF%CE%BD%CE%B7%CF%84%CE%B1/">Μεταχειρισμένα Αυτοκίνητα</a>
+    <a href="/product-category/%CE%BC%CE%B5%CF%84%CE%B1%CF%87%CE%B5%CE%B9%CF%81%CE%B9%CF%83%CE%BC%CE%AD%CE%BD%CE%B5%CF%82-%CE%BC%CE%BF%CF%84%CE%BF%CF%83%CF%85%CE%BA%CE%BB%CE%AD%CF%84%CE%B5%CF%82/">Μεταχειρισμένες Μοτοσυκλέτες</a>
+    <a href="/product-category/%CE%B7-%CE%B5%CF%84%CE%B1%CE%B9%CF%81%CE%AF%CE%B1/">Η Εταιρεία</a>
+</nav>
+
+<!-- DYNAMIC PRODUCT CONTENT -->
+<div id="product-content" style="display:none">
+    <div class="product-page">
+        <div class="product-layout">
+            <div class="product-gallery">
+                <div id="product-badge-area"></div>
+                <img id="product-main-img" class="main-img" src="" alt="">
+                <div id="product-thumbs" class="product-thumbnails"></div>
+            </div>
+            <div class="product-info">
+                <h1 id="product-title"></h1>
+                <div id="product-price" class="product-price"></div>
+                <div id="product-short-desc" class="product-desc"></div>
+                <button id="product-add-btn" class="product-add-btn" onclick="addToCart()">🛒 Προσθήκη στο καλάθι</button>
+                <div id="product-specs-area" style="margin-top:30px"></div>
+            </div>
+        </div>
+        <div id="product-full-desc" style="margin-top:40px"></div>
+    </div>
+</div>
+
+<!-- 404 CONTENT -->
+<div id="not-found-content" style="display:none">
+    <div class="not-found-page">
+        <h1>404</h1>
+        <p>Η σελίδα δεν βρέθηκε</p>
+        <p style="margin-top:20px"><a href="/" style="color:var(--am-primary);font-weight:700;font-size:18px">← Επιστροφή στην αρχική</a></p>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="am-footer">
+    <p>© <span class="current-year">2026</span> <a href="/" style="color:inherit;text-decoration:none;font-weight:700;">Automarinikas</a> – Μεταχειρισμένα Αυτοκίνητα & Μοτοσυκλέτες Θεσσαλονίκη</p>
+</footer>
+
+<script src="/js/config.js"></script>
+<script src="/js/user-nav.js"></script>
+<script src="/js/shop.js"></script>
+<script>
+(async function() {
+    const path = window.location.pathname;
+    const productMatch = path.match(/^\/product\/([^\/]+)\/?$/);
+    
+    if (!productMatch) {
+        // Not a product URL — show 404
+        document.getElementById('not-found-content').style.display = '';
+        return;
+    }
+    
+    const slug = decodeURIComponent(productMatch[1]);
+    
+    try {
+        const resp = await fetch('/data/vehicles.json?t=' + Math.floor(Date.now() / 60000));
+        const data = await resp.json();
+        const all = [...(data.cars || []), ...(data.motorcycles || [])];
+        const v = all.find(x => x.slug === slug);
+        
+        if (!v) {
+            document.getElementById('not-found-content').style.display = '';
+            return;
+        }
+        
+        // Populate product page
+        document.title = v.name + ' – Automarinikas';
+        document.getElementById('product-title').textContent = v.name;
+        
+        // Price
+        const priceEl = document.getElementById('product-price');
+        const fmt = n => new Intl.NumberFormat('el-GR', { style: 'currency', currency: 'EUR' }).format(n);
+        if (v.sale_price && v.sale_price < v.price) {
+            priceEl.innerHTML = `<del>${fmt(v.price)}</del> ${fmt(v.sale_price)}`;
+        } else {
+            priceEl.textContent = fmt(v.price);
+        }
+        
+        // Badge
+        const isOnOffer = v.on_offer || (v.sale_price && v.sale_price < v.price);
+        if (isOnOffer) {
+            document.getElementById('product-badge-area').innerHTML = '<span class="product-badge">Προσφορά!</span>';
+        }
+        
+        // Images
+        function getImgUrl(img) {
+            return img.startsWith('http') ? img : '/' + img.replace(/^\//, '');
+        }
+        
+        const mainImg = document.getElementById('product-main-img');
+        if (v.images && v.images.length > 0) {
+            mainImg.src = getImgUrl(v.images[0]);
+            mainImg.alt = v.name;
+            
+            if (v.images.length > 1) {
+                const thumbs = document.getElementById('product-thumbs');
+                v.images.forEach((img, i) => {
+                    const t = document.createElement('img');
+                    t.src = getImgUrl(img);
+                    t.alt = v.name + ' ' + (i + 1);
+                    if (i === 0) t.classList.add('active');
+                    t.onclick = function() {
+                        mainImg.src = this.src;
+                        thumbs.querySelectorAll('img').forEach(x => x.classList.remove('active'));
+                        this.classList.add('active');
+                    };
+                    thumbs.appendChild(t);
+                });
+            }
+        } else {
+            mainImg.src = '/wp-content/uploads/2021/11/automarinikas-logo.jpg';
+        }
+        
+        // Short description
+        if (v.description) {
+            document.getElementById('product-short-desc').textContent = v.description;
+        }
+        
+        // Full description
+        if (v.full_description) {
+            document.getElementById('product-full-desc').innerHTML = `
+                <h3 style="font-size:20px;font-weight:700;color:var(--am-primary-dark);margin-bottom:15px">Περιγραφή</h3>
+                <p style="line-height:1.8;color:#444;white-space:pre-line">${v.full_description}</p>`;
+        }
+        
+        // Specs table
+        if (v.extra_info) {
+            const labels = {
+                fuel: 'Καύσιμο', cc: 'Κυβικά', make: 'Μάρκα', model: 'Μοντέλο',
+                gearbox: 'Σασμάν', body_type: 'Τύπος', km: 'Χιλιόμετρα',
+                color: 'Χρώμα', year: 'Χρονολογία'
+            };
+            const rows = Object.entries(v.extra_info)
+                .filter(([k, val]) => val && val.trim())
+                .map(([k, val]) => `<tr><th>${labels[k] || k}</th><td>${val}</td></tr>`)
+                .join('');
+            if (rows) {
+                document.getElementById('product-specs-area').innerHTML = `
+                    <h3 style="font-size:20px;font-weight:700;color:var(--am-primary-dark);margin-bottom:15px">Τεχνικά Χαρακτηριστικά</h3>
+                    <table class="product-specs">${rows}</table>`;
+            }
+        }
+        
+        // Store product data for add-to-cart
+        window._currentProduct = v;
+        document.getElementById('product-content').style.display = '';
+        
+    } catch(e) {
+        console.error('Error loading product:', e);
+        document.getElementById('not-found-content').style.display = '';
+    }
+})();
+
+async function addToCart() {
+    const v = window._currentProduct;
+    if (!v) return;
+    
+    const btn = document.getElementById('product-add-btn');
+    btn.textContent = '⏳';
+    
+    if (window.ShopAPI) {
+        const sid = window.ShopAPI.getSessionId();
+        // Check if already in cart
+        const cartData = await window.ShopAPI.apiCall('/cart?session_id=' + sid);
+        if (cartData && cartData.items && cartData.items.some(i => i.product_id === v.id)) {
+            window.ShopAPI.showNotification('Αυτό το όχημα είναι ήδη στο καλάθι σας!', 'error');
+            btn.textContent = '🛒 Προσθήκη στο καλάθι';
+            return;
+        }
+        
+        const result = await window.ShopAPI.apiCall('/cart/add', 'POST', {
+            product_id: v.id, quantity: 1, session_id: sid
+        });
+        if (result && result.success) {
+            window.ShopAPI.showNotification(result.message, 'success');
+            window.ShopAPI.updateCartBadge();
+            btn.textContent = '✓ Προστέθηκε!';
+            setTimeout(() => { btn.textContent = '🛒 Προσθήκη στο καλάθι'; }, 2000);
+        } else {
+            window.ShopAPI.showNotification('Σφάλμα: ' + (result?.error || 'Δεν ήταν δυνατή η προσθήκη'), 'error');
+            btn.textContent = '🛒 Προσθήκη στο καλάθι';
+        }
+    }
+}
+</script>
+</body>
+</html>

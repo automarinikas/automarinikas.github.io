@@ -64,8 +64,9 @@
 
     // Create HTML for a single product card
     function createProductCard(vehicle) {
-        const imgSrc = vehicle.images && vehicle.images.length > 0
-            ? '/' + vehicle.images[0].replace(/^\//, '')
+        const firstImg = vehicle.images && vehicle.images.length > 0 ? vehicle.images[0] : '';
+        const imgSrc = firstImg
+            ? (firstImg.startsWith('http') ? firstImg : '/' + firstImg.replace(/^\//, ''))
             : '/wp-content/uploads/2021/11/automarinikas-logo.jpg';
 
         const productUrl = '/product/' + vehicle.slug + '/';
