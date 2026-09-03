@@ -177,6 +177,22 @@ li.tve-state-active span {
     text-transform: uppercase;
 }
 
+/* ===== SITE FOOTER ===== */
+.am-footer {
+    background: var(--am-primary-dark);
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    padding: 25px 20px;
+    font-size: 14px;
+    font-weight: 400;
+}
+.am-footer a {
+    color: rgba(255,255,255,0.9);
+}
+.am-footer a:hover {
+    color: var(--am-accent);
+}
+
 /* ===== BULLETPROOF VEHICLE GRID (ALWAYS STARTS TOP-LEFT, FILLS EVENLY) ===== */
 .am-vehicle-grid,
 ul.products,
