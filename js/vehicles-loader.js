@@ -85,7 +85,8 @@
                 </span>`;
         }
 
-        const saleTag = vehicle.on_offer ? '<span class="onsale" style="position:absolute;top:10px;left:10px;background:#e7ff00;color:#0f1d7b;padding:4px 12px;font-weight:700;font-size:14px;z-index:2;border-radius:3px">Προσφορά!</span>' : '';
+        const isOnOffer = vehicle.on_offer || (vehicle.sale_price && vehicle.sale_price < vehicle.price);
+        const saleTag = isOnOffer ? '<span class="onsale" style="position:absolute;top:10px;left:10px;background:#e7ff00;color:#0f1d7b;padding:4px 12px;font-weight:700;font-size:14px;z-index:2;border-radius:3px">Προσφορά!</span>' : '';
 
         return `
             <li class="product type-product" data-vehicle-id="${vehicle.id}" data-price="${vehicle.sale_price || vehicle.price}">
