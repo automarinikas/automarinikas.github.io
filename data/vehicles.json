@@ -39,6 +39,32 @@
         "wp-content/uploads/2024/02/9-2.jpg"
       ],
       "in_stock": true
+    },
+    {
+      "id": 104,
+      "name": "sdfddsfsdf",
+      "slug": "sdfddsfsdf",
+      "price": 3000,
+      "sale_price": 2000,
+      "description": "ssfdsf",
+      "full_description": "fsdsfsdsdfsfsfd",
+      "extra_info": {
+        "fuel": "",
+        "cc": "",
+        "make": "",
+        "model": "",
+        "gearbox": "",
+        "body_type": "",
+        "km": "",
+        "color": "",
+        "year": ""
+      },
+      "images": [
+        "/uploads/1788398915_1719060909226.jpg",
+        "/uploads/1788398933_1700236584481.jpg"
+      ],
+      "on_offer": true,
+      "in_stock": true
     }
   ],
   "motorcycles": [
